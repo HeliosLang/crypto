@@ -1,0 +1,32 @@
+{
+    "name": "@helios-lang/crypto",
+    "version": "0.1.0",
+    "description": "Cryptography primitives used throughout HeliosLang codebase",
+    "main": "src/index.js",
+    "type": "module",
+    "scripts": {
+        "build": "npm test",
+        "clean": "find src/ -name *.d.ts* | xargs rm -f",
+        "postbuild": "npm run clean",
+        "prebuild": "npm run clean && npx tsc -p jsconfig.json --noEmit false --emitDeclarationOnly",
+        "prepare": "npm run build",
+        "prettify": "npx prettier . --write",
+        "test": "npx prettier . --check && tsc -p jsconfig.json --noEmit && node --test --experimental-test-coverage"
+    },
+    "author": "Christian Schmitz",
+    "license": "BSD-3-Clause",
+    "prettier": {
+        "trailingComma": "none",
+        "tabWidth": 4,
+        "semi": false,
+        "singleQuote": false
+    },
+    "devDependencies": {
+        "@types/node": "^20.10.4",
+        "prettier": "^3.1.0",
+        "typescript": "^5.3.3"
+    },
+    "dependencies": {
+        "@helios-lang/codec-utils": "^0.1.14"
+    }
+}
