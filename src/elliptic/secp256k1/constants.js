@@ -1,23 +1,13 @@
+// Decimal representations of large numbers because that's most common in literature
+
 // curve prime, 2^256−2^32−977, so 256 bits are needed to encode a coordinate, so 257 bits are needed to encoded a compressed point
 //  round up to word size this becomes 264 bits, or 33 bytes
 export const P =
     115792089237316195423570985008687907853269984665640564039457584007908834671663n
 
-// largest prime <= max number of unique points on cursve
+// Curve scale order, prime <= max number of unique points on curve
 export const N =
     115792089237316195423570985008687907852837564279074904382605163141518161494337n
-
-export const BETA =
-    55594575648329892869085402983802832744385952214688224221778511981742606582254n
-export const LAMBDA =
-    37718080363155996902926221483475020450927657555482586988616620542887997980018n
-
-export const H = 1n
-
-export const A1 = 64502973549206556628585045361533709077n
-export const A2 = 367917413016453100223835821029139468248n
-export const B1 = -303414439467246543595250775667605759171n
-export const B2 = 64502973549206556628585045361533709077n
 
 // Generator point
 export const Gx =

@@ -5,13 +5,13 @@ import { decodeScalar, decodePrivateKey, encodeScalar } from "./codec.js"
 import { N } from "./constants.js"
 
 /**
- * @template {CurvePoint<T>} T
- * @typedef {import("../CurvePoint.js").CurvePoint<T>} CurvePoint
+ * @template {Point<T>} T
+ * @typedef {import("../common/index.js").Point<T>} Point
  */
 
 /**
- * @template {CurvePoint<T>} T
- * @typedef {import("../CurvePoint.js").CurvePointClass<T>} CurvePointClass
+ * @template {Point<T>} T
+ * @typedef {import("../common/index.js").PointClass<T>} CurvePointClass
  */
 
 const hash = sha2_512
@@ -80,20 +80,20 @@ const hash = sha2_512
  *
  * The arithmatic details are handled by the CurvePoint class
  *
- * @template {CurvePoint<T>} T
+ * @template {Point<T>} T
  */
 export class EdDSA {
     /**
      * @type {CurvePointClass<T>}
      */
-    #CurvePointImpl
+    #PointImpl
 
     /**
      *
      * @param {CurvePointClass<T>} impl
      */
     constructor(impl) {
-        this.#CurvePointImpl = impl
+        this.#PointImpl = impl
     }
 
     /**
@@ -123,12 +123,14 @@ export class EdDSA {
         }
 
         const x = decodePrivateKey(privateKey)
-        const h = this.#CurvePointImpl.BASE.mul(x)
+        const h = this.#PointImpl.BASE.mul(x)
 
         return h.encode()
     }
 
     /**
+     * Sign the message.
+     * Even though this implementation isn't constant time, it isn't vulnerable to a timing attack (see detailed notes in the code)
      * @param {number[]} message
      * @param {number[]} privateKey
      * @param {boolean} hashPrivateKey - defaults to true, Bip32 passes this as false
@@ -145,20 +147,32 @@ export class EdDSA {
             }
         }
 
-        // extract privateKey as integer
+        // Extract privateKey as integer
+        //   (Not vulnerable to timing attack because there is no mixing with the message,
+        //      so always takes the same amount of time for the same privateKey)
         const x = decodePrivateKey(privateKey)
 
-        // for convenience calculate publicKey here:
-        const publicKey = this.#CurvePointImpl.BASE.mul(x).encode()
+        // For convenience calculate publicKey here
+        //   (Not vulnerable to timing attack because there is no mixing with the message,
+        //      so always takes the same amount of time for the same privateKey)
+        const publicKey = this.#PointImpl.BASE.mul(x).encode()
 
-        // generate a practically random number
+        // Generate a practically random number
+        //   (Not vulnerable to timing attack because sha2_512 runtime only depends on message length,
+        //     so timing doesn't expose any bytes of the privateKey)
         const k = this.oneWay(privateKey.slice(32, 64).concat(message))
 
-        // first part of the signature
-        const a = this.#CurvePointImpl.BASE.mul(k)
+        // First part of the signature
+        //   (Not vulnerable to timing attack because variations in the message create huge random variations in k)
+        const a = this.#PointImpl.BASE.mul(k)
         const aEncoded = a.encode()
 
-        // second part of the signature
+        // Second part of the signature
+        //   (Not vulnerable to timing attack.
+        //      Even tough f is known publicly and changes with each message,
+        //      and the f * x operation isn't constant time (bigint ops in JS aren't constant time),
+        //      k also changes with each message, and the [k]BASE operation above
+        //      is much more expensive than multiplying two big ints)
         const f = this.oneWay(aEncoded.concat(publicKey).concat(message))
         const b = mod(k + f * x, N)
         const bEncoded = encodeScalar(b)
@@ -178,15 +192,15 @@ export class EdDSA {
             throw new Error(`unexpected signature length ${signature.length}`)
         }
 
-        const a = this.#CurvePointImpl.decode(signature.slice(0, 32))
+        const a = this.#PointImpl.decode(signature.slice(0, 32))
         const b = decodeScalar(signature.slice(32, 64))
 
-        const h = this.#CurvePointImpl.decode(publicKey)
+        const h = this.#PointImpl.decode(publicKey)
         const f = this.oneWay(
             signature.slice(0, 32).concat(publicKey).concat(message)
         )
 
-        const left = this.#CurvePointImpl.BASE.mul(b)
+        const left = this.#PointImpl.BASE.mul(b)
         const right = a.add(h.mul(f))
 
         return left.equals(right)

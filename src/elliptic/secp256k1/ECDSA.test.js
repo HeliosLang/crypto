@@ -1,8 +1,8 @@
 import { describe, it } from "node:test"
 import { deepEqual, strictEqual, throws } from "node:assert"
 import { bytesToHex, encodeUtf8, hexToBytes } from "@helios-lang/codec-utils"
-import { ECDSA, ECDSASecp256k1 as ecdsaExtended } from "./ECDSA.js"
 import { sha3_256 } from "../../digest/sha3_256.js"
+import { ECDSA, ECDSASecp256k1 as ecdsaExtended } from "./ECDSA.js"
 import { AffinePoint } from "./AffinePoint.js"
 
 const ecdsaAffine = new ECDSA(AffinePoint)

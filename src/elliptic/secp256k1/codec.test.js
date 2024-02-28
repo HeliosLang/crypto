@@ -2,7 +2,7 @@ import { describe, it } from "node:test"
 import {
     decodeMessageHash,
     decodePrivateKey,
-    decodeSignature,
+    decodeECDSASignature,
     encodeSignature
 } from "./codec.js"
 import { bytesToHex, hexToBytes } from "@helios-lang/codec-utils"
@@ -42,10 +42,10 @@ describe(decodePrivateKey.name, () => {
     })
 })
 
-describe(decodeSignature.name, () => {
+describe(decodeECDSASignature.name, () => {
     it(`decodes #b8..11 as [833..138n, 489..753n]`, () => {
         deepEqual(
-            decodeSignature(
+            decodeECDSASignature(
                 hexToBytes(
                     "b83380f6e1d09411ebf49afd1a95c738686bfb2b0fe2391134f4ae3d6d77b78a6c305afcac930a3ea1721c04d8a1a979016baae011319746323a756fbaee1811"
                 )
@@ -58,15 +58,15 @@ describe(decodeSignature.name, () => {
     })
 
     it(`fails for invalid length signature`, () => {
-        throws(() => decodeSignature([]))
+        throws(() => decodeECDSASignature([]))
     })
 
     it(`fails for invalid length signature`, () => {
-        throws(() => decodeSignature(new Array(31).fill(0)))
+        throws(() => decodeECDSASignature(new Array(31).fill(0)))
     })
 
     it(`fails for invalid signature (all 0 bytes)`, () => {
-        throws(() => decodeSignature(new Array(64).fill(0)))
+        throws(() => decodeECDSASignature(new Array(64).fill(0)))
     })
 })
 

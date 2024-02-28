@@ -1,6 +1,6 @@
 import { decodeIntBE, encodeIntBE } from "@helios-lang/codec-utils"
 import { mod } from "../common/index.js"
-import { N } from "./constants.js"
+import { N, P } from "./constants.js"
 
 // sadly each curve has other encoding/decoding requirements for scalars and for curve points, so these functions can't be reused across curves
 
@@ -46,7 +46,7 @@ export function decodePrivateKey(bytes) {
 
     const d = decodeScalar(bytes)
 
-    if (d < 0n || d >= N) {
+    if (d <= 0n || d >= N) {
         throw new Error("private key out of range")
     }
 
@@ -55,9 +55,10 @@ export function decodePrivateKey(bytes) {
 
 /**
  * @param {number[]} bytes
+ * @param {bigint} rModulo Schnorr requires this to be P, but ECDSA requires this to be N (N is the default)
  * @returns {[bigint, bigint]} [r, s]
  */
-export function decodeSignature(bytes) {
+function decodeSignature(bytes, rModulo) {
     if (bytes.length != 64) {
         throw new Error(`expected 64 byte signature, got ${bytes.length} bytes`)
     }
@@ -65,7 +66,7 @@ export function decodeSignature(bytes) {
     const r = decodeScalar(bytes.slice(0, 32))
     const s = decodeScalar(bytes.slice(32, 64))
 
-    if (r <= 0n || r >= N) {
+    if (r <= 0n || r >= rModulo) {
         throw new Error("invalid first part of signature")
     }
 
@@ -75,6 +76,22 @@ export function decodeSignature(bytes) {
     }
 
     return [r, s]
+}
+
+/**
+ * @param {number[]} bytes
+ * @returns {[bigint, bigint]} [r, s]
+ */
+export function decodeECDSASignature(bytes) {
+    return decodeSignature(bytes, N)
+}
+
+/**
+ * @param {number[]} bytes
+ * @returns {[bigint, bigint]} [r, s]
+ */
+export function decodeSchnorrSignature(bytes) {
+    return decodeSignature(bytes, P)
 }
 
 /**

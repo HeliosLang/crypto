@@ -1,15 +1,15 @@
 import { getBit } from "@helios-lang/codec-utils"
-import { equalsAffine, exp, invert, mod, mul } from "../common/index.js"
+import { exp, invert, mod, scalePoint } from "../common/index.js"
 import { P, D, Gx, Gy, P38, SQRT2P14 } from "./constants.js"
 import { decodeScalar, encodeScalar } from "./codec.js"
 
 /**
- * @template {CurvePoint<T>} T
- * @typedef {import("../CurvePoint.js").CurvePoint<T>} CurvePoint<T>
+ * @template {Point<T>} T
+ * @typedef {import("../common/index.js").Point<T>} Point<T>
  */
 
 /**
- * @implements {CurvePoint<AffinePoint>}
+ * @implements {Point<AffinePoint>}
  */
 export class AffinePoint {
     /**
@@ -93,6 +93,13 @@ export class AffinePoint {
     }
 
     /**
+     * @returns {boolean}
+     */
+    isZero() {
+        return this.x == AffinePoint.ZERO.x && this.y == AffinePoint.ZERO.y
+    }
+
+    /**
      * Curve point 'addition'
      * Note: the invert call in this calculation is very slow (prefer ExtendedPoint for speed)
      * @param {AffinePoint} other
@@ -117,7 +124,7 @@ export class AffinePoint {
      * @returns {boolean}
      */
     equals(other) {
-        return equalsAffine(this, other)
+        return this.x == other.x && this.y == other.y
     }
 
     /**
@@ -138,7 +145,15 @@ export class AffinePoint {
      * @returns {AffinePoint}
      */
     mul(n) {
-        return mul(this, n, AffinePoint.ZERO)
+        return scalePoint(this, n, AffinePoint.ZERO)
+    }
+
+    /**
+     *
+     * @returns {AffinePoint}
+     */
+    neg() {
+        return new AffinePoint(mod(-this.x, P), this.y)
     }
 
     /**

@@ -1,7 +1,15 @@
-import { equalsAffine, mul, exp, invert, mod } from "../common/index.js"
+import { scalePoint, exp, invert, mod } from "../common/index.js"
 import { decodeScalar, encodeScalar } from "./codec.js"
 import { Gx, Gy, P, P14 } from "./constants.js"
 
+/**
+ * @template {Point<T>} T
+ * @typedef {import("../common/index.js").Point<T>} Point
+ */
+
+/**
+ * @implements {Point<AffinePoint>}
+ */
 export class AffinePoint {
     /**
      * @readonly
@@ -57,16 +65,25 @@ export class AffinePoint {
             throw new Error(`x coordinate out of range`)
         }
 
-        const y2 = mod(mod(x * x, P) * x + 7n, P)
+        const x3 = mod(mod(x * x, P) * x, P)
+        const y2 = mod(x3 + 7n, P)
 
         // sqrt
         let y = exp(y2, P14, P)
 
+        if (mod(y * y, P) != y2) {
+            throw new Error("sqrt of y failed")
+        }
+
         if (head == 0x03) {
             if (y % 2n == 0n) {
-                y = mod(-y, P)
+                y = P - y
             }
-        } else if (head != 0x02) {
+        } else if (head == 0x02) {
+            if (y % 2n != 0n) {
+                y = P - y
+            }
+        } else {
             throw new Error(`unexpected header byte ${head}`)
         }
 
@@ -83,7 +100,7 @@ export class AffinePoint {
      * @returns {boolean}
      */
     isZero() {
-        return equalsAffine(this, AffinePoint.ZERO)
+        return this.x == AffinePoint.ZERO.x && this.y == AffinePoint.ZERO.y
     }
 
     /**
@@ -111,7 +128,7 @@ export class AffinePoint {
      * @returns {AffinePoint}
      */
     mul(scalar) {
-        return mul(this, scalar, AffinePoint.ZERO)
+        return scalePoint(this, scalar, AffinePoint.ZERO)
     }
 
     /**
@@ -184,7 +201,7 @@ export class AffinePoint {
      * @returns {boolean}
      */
     equals(other) {
-        return equalsAffine(this, other)
+        return this.x == other.x && this.y == other.y
     }
 
     /**

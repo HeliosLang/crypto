@@ -1,15 +1,15 @@
-import { equalsExtended, invert, mod, mul } from "../common/index.js"
+import { equalsExtended, invert, mod, scalePoint } from "../common/index.js"
 import { AffinePoint } from "./AffinePoint.js"
 import { D, P } from "./constants.js"
 
 /**
- * @template {CurvePoint<T>} T
- * @typedef {import("../CurvePoint.js").CurvePoint<T>} CurvePoint<T>
+ * @template {Point<T>} T
+ * @typedef {import("../common/index.js").Point<T>} Point<T>
  */
 
 /**
  * ExtendedPoint implementation taken from: [https://github.com/paulmillr/noble-ed25519](https://github.com/paulmillr/noble-ed25519).
- * @implements {CurvePoint<ExtendedPoint>}
+ * @implements {Point<ExtendedPoint>}
  */
 export class ExtendedPoint {
     /**
@@ -132,7 +132,15 @@ export class ExtendedPoint {
      * @returns {boolean}
      */
     equals(other) {
-        return equalsExtended(this, other, P)
+        return equalsExtended(
+            this.x,
+            this.y,
+            this.z,
+            other.x,
+            other.y,
+            other.z,
+            P
+        )
     }
 
     /**
@@ -154,7 +162,19 @@ export class ExtendedPoint {
      * @returns {ExtendedPoint}
      */
     mul(n) {
-        return mul(this, n, ExtendedPoint.ZERO)
+        return scalePoint(this, n, ExtendedPoint.ZERO)
+    }
+
+    /**
+     * @returns {ExtendedPoint}
+     */
+    neg() {
+        return new ExtendedPoint(
+            mod(-this.x, P),
+            this.y,
+            this.z,
+            mod(-this.t, P)
+        )
     }
 
     /**

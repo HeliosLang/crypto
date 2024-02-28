@@ -1,67 +1,74 @@
-/**
- * @template {CurvePoint<T>} T
- * @typedef {import("../common/CurvePoint.js").CurvePoint<T>} CurvePoint
- */
-
+import { invert, mod } from "../common/index.js"
 import { hmacDrbg } from "../../rand/index.js"
-import { invert, mod } from "../common/ops.js"
 import {
     decodeScalar,
     decodePrivateKey,
     decodeMessageHash,
-    decodeSignature,
+    decodeECDSASignature,
     encodeSignature
 } from "./codec.js"
 import { N } from "./constants.js"
 import { ExtendedPoint } from "./ExtendedPoint.js"
 
 /**
- * @template {CurvePoint<T>} T
- * @typedef {import("../common/CurvePoint.js").CurvePointClass<T>} CurvePointClass
+ * @template {Point<T>} T
+ * @typedef {import("../common/Point.js").Point<T>} Point
+ */
+
+/**
+ * @template {Point<T>} T
+ * @typedef {import("../common/Point.js").PointClass<T>} PointClass
  */
 
 /**
  * The ECDSA algorithm is explained very well here: https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages
- * @template {CurvePoint<T>} T
+ * @template {Point<T>} T
  */
 export class ECDSA {
     /**
-     *
+     *@type {PointClass<T>}
      */
-    #CurvePointImpl
+    #PointImpl
 
     /**
      *
-     * @param {CurvePointClass<T>} CurvePointImpl
+     * @param {PointClass<T>} CurvePointImpl
      */
     constructor(CurvePointImpl) {
-        this.#CurvePointImpl = CurvePointImpl
+        this.#PointImpl = CurvePointImpl
     }
 
     /**
+     * Derives a 33 byte public key from a 32 byte privateKey
      * @param {number[]} privateKey
-     * @returns {number[]} 32 byte public key.
+     * @returns {number[]} 33 byte public key (first byte is evenOdd bit)
      */
     derivePublicKey(privateKey) {
         const x = decodePrivateKey(privateKey)
-        const h = this.#CurvePointImpl.BASE.mul(x)
+        const h = this.#PointImpl.BASE.mul(x)
 
         return h.encode()
     }
 
     /**
-     * @param {number[]} messageHash
-     * @param {number[]} privateKey
+     * Sign the 32 messageHash.
+     * Even though this implementation isn't constant time, it isn't vulnerable to a timing attack (see detailed notes in the code).
+     * @param {number[]} messageHash 32 bytes
+     * @param {number[]} privateKey 32 bytes
      * @returns {number[]} 64 byte signature.
      */
     sign(messageHash, privateKey) {
-        // extract privateKey as integer
+        // Extract privateKey as integer
+        //   (Not vulnerable to timing attack, because messageHash doesn't impact this,
+        //     and same privateKey will probably always be used for repeated calls)
         const x = decodePrivateKey(privateKey)
 
-        // hash message
+        // Hash message
         const h1 = decodeMessageHash(messageHash)
 
-        // generate a practically random number using hmacDrbg
+        // Generate a practically random number using hmacDrbg
+        //   (Not vulnerable to timing attack, because seed is always
+        //     the same length and sha2_256 timing only depends on length)
         return hmacDrbg(privateKey.concat(messageHash), (kBytes) => {
             const k = decodeScalar(kBytes)
 
@@ -70,7 +77,9 @@ export class ECDSA {
                 return
             }
 
-            const q = this.#CurvePointImpl.BASE.mul(k).toAffine()
+            // First part of signature
+            //   (Not vulnerable to timing attack because k is random, and the privateKey isn't involved)
+            const q = this.#PointImpl.BASE.mul(k).toAffine()
             const r = mod(q.x, N)
 
             // if r is invalid => generate other kBytes
@@ -78,15 +87,18 @@ export class ECDSA {
                 return
             }
 
-            const ik = invert(k, N)
+            // Second part of signature
+            //   (Not vulnerable to timing attack because even though x*r is non-constant time,
+            //      and r is public, k is random and private and most the calculation time depends on k (for [k]BASE and k^-1))
+            const ik = invert(k, N) // this inversion is expensive, but only happens once if the ExtendedPoint implementation is used for [k]BASE)
             let s = mod(ik * mod(h1 + mod(x * r, N), N), N)
 
-            // if s is invalid => generate other kBytes
+            // If s is invalid => generate other kBytes
             if (s === 0n) {
                 return
             }
 
-            // the plutus-core spec dictates the use of lowS
+            // The plutus-core spec dictates the use of lowS
             if (s > N >> 1n) {
                 s = mod(-s, N)
             }
@@ -109,7 +121,7 @@ export class ECDSA {
         }
 
         const h1 = decodeMessageHash(messageHash)
-        const [r, s] = decodeSignature(signature)
+        const [r, s] = decodeECDSASignature(signature)
 
         // lowS check
         if (s > N >> 1n) {
@@ -120,8 +132,8 @@ export class ECDSA {
         const u1 = mod(h1 * si, N)
         const u2 = mod(r * si, N)
 
-        const h = this.#CurvePointImpl.decode(publicKey)
-        const R = this.#CurvePointImpl.BASE.mul(u1).add(h.mul(u2)).toAffine()
+        const h = this.#PointImpl.decode(publicKey)
+        const R = this.#PointImpl.BASE.mul(u1).add(h.mul(u2)).toAffine()
 
         return mod(R.x, N) === r
     }

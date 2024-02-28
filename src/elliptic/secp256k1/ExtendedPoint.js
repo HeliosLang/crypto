@@ -1,16 +1,14 @@
-/**
- * @template {CurvePoint<T>} T
- * @typedef {import("../CurvePoint.js").CurvePoint<T>} CurvePoint
- */
-
-import { equalsExtended, mod, mul, invert } from "../common/index.js"
+import { equalsExtended, mod, scalePoint, invert } from "../common/index.js"
 import { Gx, Gy, P } from "./constants.js"
 import { AffinePoint } from "./AffinePoint.js"
 
 /**
- *
- *
- * @implements {CurvePoint<ExtendedPoint>}
+ * @template {Point<T>} T
+ * @typedef {import("../common/index.js").Point<T>} Point
+ */
+
+/**
+ * @implements {Point<ExtendedPoint>}
  */
 export class ExtendedPoint {
     /**
@@ -95,7 +93,15 @@ export class ExtendedPoint {
      * @returns {boolean}
      */
     equals(other) {
-        return equalsExtended(this, other, P)
+        return equalsExtended(
+            this.x,
+            this.y,
+            this.z,
+            other.x,
+            other.y,
+            other.z,
+            P
+        )
     }
 
     /**
@@ -161,7 +167,14 @@ export class ExtendedPoint {
      * @returns {ExtendedPoint}
      */
     mul(n) {
-        return mul(this, n, ExtendedPoint.ZERO)
+        return scalePoint(this, n, ExtendedPoint.ZERO)
+    }
+
+    /**
+     * @returns {ExtendedPoint}
+     */
+    neg() {
+        return new ExtendedPoint(this.x, mod(-this.y, P), this.z)
     }
 
     /**
