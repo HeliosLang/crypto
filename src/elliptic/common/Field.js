@@ -22,7 +22,6 @@
  * A Field should be usable without knowing the number used for modulo operations.
  *
  * @template T bigint, [bigint, bigint], etc.
- *
  * @typedef {{
  *   ZERO: T
  *   ONE: T
@@ -35,3 +34,14 @@
  *   sqrt: (a: T) => T
  * }} Field
  */
+
+/**
+ * @template T
+ * @param {Field<T>} F
+ * @param {T} a
+ * @param {T} b
+ * @returns {T}
+ */
+export function subtract(F, a, b) {
+    return F.add(a, F.scale(b, -1n))
+}

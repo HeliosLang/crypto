@@ -1,6 +1,7 @@
-import { scalePoint, exp, invert, mod } from "../common/index.js"
+import { scalePoint } from "../common/index.js"
 import { decodeScalar, encodeScalar } from "./codec.js"
-import { Gx, Gy, P, P14 } from "./constants.js"
+import { Gx, Gy, P } from "./constants.js"
+import { F } from "./field.js"
 
 /**
  * @template {Point<T>} T
@@ -65,23 +66,19 @@ export class AffinePoint {
             throw new Error(`x coordinate out of range`)
         }
 
-        const x3 = mod(mod(x * x, P) * x, P)
-        const y2 = mod(x3 + 7n, P)
+        const x3 = F.multiply(F.multiply(x, x), x)
+        const y2 = F.add(x3, 7n)
 
         // sqrt
-        let y = exp(y2, P14, P)
-
-        if (mod(y * y, P) != y2) {
-            throw new Error("sqrt of y failed")
-        }
+        let y = F.sqrt(y2)
 
         if (head == 0x03) {
             if (y % 2n == 0n) {
-                y = P - y
+                y = F.scale(y, -1n)
             }
         } else if (head == 0x02) {
             if (y % 2n != 0n) {
-                y = P - y
+                y = F.scale(y, -1n)
             }
         } else {
             throw new Error(`unexpected header byte ${head}`)
@@ -116,11 +113,11 @@ export class AffinePoint {
         const x = this.x
         const y = this.y
 
-        const x2 = mod(x * x, P)
-        const x3 = mod(x2 * x, P)
-        const y2 = mod(y * y, P)
+        const x2 = F.multiply(x, x)
+        const x3 = F.multiply(x2, x)
+        const y2 = F.multiply(y, y)
 
-        return mod(y2 - x3 - 7n, P) == 0n
+        return F.add(y2 - x3, -7n) == 0n
     }
 
     /**
@@ -139,7 +136,7 @@ export class AffinePoint {
         if (this.isZero()) {
             return this
         } else {
-            return new AffinePoint(this.x, mod(-this.y, P))
+            return new AffinePoint(this.x, F.scale(this.y, -1n))
         }
     }
 
@@ -161,17 +158,17 @@ export class AffinePoint {
         }
 
         // P + Q = O
-        if (mod(this.x + other.x, P) == 0n) {
+        if (F.add(this.x, other.x) == 0n) {
             return AffinePoint.ZERO
         }
 
-        const dx = mod(this.x - other.x, P)
-        const dy = mod(this.y - other.y, P)
-        const s = mod(dy * invert(dx, P), P)
-        const s2 = mod(s * s, P)
+        const dx = F.add(this.x, -other.x)
+        const dy = F.add(this.y, -other.y)
+        const s = F.multiply(dy, F.invert(dx))
+        const s2 = F.multiply(s, s)
 
-        const nx = mod(s2 - this.x - other.x, P)
-        const ny = mod(mod(s * mod(this.x - nx, P), P) - this.y, P)
+        const nx = F.add(s2 - this.x, -other.x)
+        const ny = F.add(F.multiply(s, F.add(this.x, -nx)), -this.y)
 
         return new AffinePoint(nx, ny)
     }
@@ -181,17 +178,17 @@ export class AffinePoint {
      * @returns {AffinePoint}
      */
     double() {
-        const tx = mod(2n * this.x, P)
-        const ty = mod(2n * this.y, P)
+        const tx = F.scale(this.x, 2n)
+        const ty = F.scale(this.y, 2n)
 
-        const x2 = mod(this.x * this.x, P)
-        const tyi = invert(ty, P)
+        const x2 = F.multiply(this.x, this.x)
+        const tyi = F.invert(ty)
 
-        const s = mod(mod(3n * x2, P) * tyi, P)
-        const s2 = mod(s * s, P)
+        const s = F.multiply(F.scale(x2, 3n), tyi)
+        const s2 = F.multiply(s, s)
 
-        const nx = mod(s2 - tx, P)
-        const ny = mod(mod(s * mod(this.x - nx, P), P) - this.y, P)
+        const nx = F.add(s2, -tx)
+        const ny = F.add(F.multiply(s, F.add(this.x, -nx)), -this.y)
 
         return new AffinePoint(nx, ny)
     }
@@ -201,7 +198,7 @@ export class AffinePoint {
      * @returns {boolean}
      */
     equals(other) {
-        return this.x == other.x && this.y == other.y
+        return F.equals(this.x, other.x) && F.equals(this.y, other.y)
     }
 
     /**

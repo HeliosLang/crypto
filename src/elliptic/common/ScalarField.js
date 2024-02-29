@@ -151,18 +151,27 @@ export class ScalarField {
      * @returns {bigint}
      */
     sqrt(a) {
+        /**
+         * @type {bigint}
+         */
+        let res
+
         if (this.modulo % 4n == 3n) {
-            return exp(a, this.modulo14, this.modulo)
+            res = exp(a, this.modulo14, this.modulo)
+
+            if (mod(res * res, this.modulo) != a) {
+                throw new Error("sqrt failed")
+            }
         } else if (this.modulo % 8n == 5n) {
-            let res = exp(a, this.modulo38, this.modulo)
+            res = exp(a, this.modulo38, this.modulo)
 
             if (mod(res * res - a, this.modulo) != 0n) {
                 res = (res * this.sqrt2modulo14) % this.modulo
             }
-
-            return res
         } else {
             throw new Error("don't know how to sqrt with this modulo")
         }
+
+        return res
     }
 }

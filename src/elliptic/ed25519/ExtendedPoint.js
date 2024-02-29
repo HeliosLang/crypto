@@ -1,6 +1,7 @@
-import { equalsExtended, invert, mod, scalePoint } from "../common/index.js"
+import { equalsExtended, scalePoint } from "../common/index.js"
 import { AffinePoint } from "./AffinePoint.js"
 import { D, P } from "./constants.js"
+import { F } from "./field.js"
 
 /**
  * @template {Point<T>} T
@@ -57,7 +58,7 @@ export class ExtendedPoint {
             AffinePoint.BASE.x,
             AffinePoint.BASE.y,
             1n,
-            mod(AffinePoint.BASE.x * AffinePoint.BASE.y, P)
+            F.multiply(AffinePoint.BASE.x, AffinePoint.BASE.y)
         )
     }
 
@@ -85,7 +86,7 @@ export class ExtendedPoint {
             affine.x,
             affine.y,
             1n,
-            mod(affine.x * affine.y, P)
+            F.multiply(affine.x, affine.y)
         )
     }
 
@@ -104,18 +105,18 @@ export class ExtendedPoint {
         const z2 = other.z
         const t2 = other.t
 
-        const a = mod(x1 * x2, P)
-        const b = mod(y1 * y2, P)
-        const c = mod(D * t1 * t2, P)
-        const d = mod(z1 * z2, P)
-        const e = mod((x1 + y1) * (x2 + y2) - a - b, P) // TODO: is mod missing from the inner operations?
-        const f = mod(d - c, P)
-        const g = mod(d + c, P)
-        const h = mod(a + b, P)
-        const x3 = mod(e * f, P)
-        const y3 = mod(g * h, P)
-        const z3 = mod(f * g, P)
-        const t3 = mod(e * h, P)
+        const a = F.multiply(x1, x2)
+        const b = F.multiply(y1, y2)
+        const c = F.multiply(D * t1, t2)
+        const d = F.multiply(z1, z2)
+        const e = F.add((x1 + y1) * (x2 + y2), -a - b)
+        const f = F.add(d, -c)
+        const g = F.add(d, c)
+        const h = F.add(a, b)
+        const x3 = F.multiply(e, f)
+        const y3 = F.multiply(g, h)
+        const z3 = F.multiply(f, g)
+        const t3 = F.multiply(e, h)
 
         return new ExtendedPoint(x3, y3, z3, t3)
     }
@@ -170,10 +171,10 @@ export class ExtendedPoint {
      */
     neg() {
         return new ExtendedPoint(
-            mod(-this.x, P),
+            F.scale(this.x, -1n),
             this.y,
             this.z,
-            mod(-this.t, P)
+            F.scale(this.t, -1n)
         )
     }
 
@@ -184,11 +185,11 @@ export class ExtendedPoint {
         if (this.isZero()) {
             return AffinePoint.ZERO
         } else {
-            const zInverse = invert(this.z, P)
+            const zInverse = F.invert(this.z)
 
             return new AffinePoint(
-                mod(this.x * zInverse, P),
-                mod(this.y * zInverse, P)
+                F.multiply(this.x, zInverse),
+                F.multiply(this.y, zInverse)
             )
         }
     }

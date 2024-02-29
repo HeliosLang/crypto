@@ -1,6 +1,12 @@
 import { decodeIntBE, encodeIntBE } from "@helios-lang/codec-utils"
 import { mod } from "../common/index.js"
 import { N, P } from "./constants.js"
+import { F } from "./field.js"
+
+/**
+ * @template T
+ * @typedef {import("../common/index.js").Point2<T>} Point2
+ */
 
 // sadly each curve has other encoding/decoding requirements for scalars and for curve points, so these functions can't be reused across curves
 
@@ -116,4 +122,56 @@ export function encodeScalar(x) {
  */
 export function encodeSignature(r, s) {
     return encodeScalar(r).concat(encodeScalar(s))
+}
+
+/**
+ * @param {number[]} bytes
+ * @returns {Point2<bigint>}
+ */
+export function decodeECDSAPoint(bytes) {
+    if (bytes.length != 33) {
+        throw new Error(
+            `expected 33 bytes for encoded point, got ${bytes.length}`
+        )
+    }
+
+    const head = bytes[0]
+
+    const x = decodeScalar(bytes.slice(1))
+
+    if (x <= 0n || x >= P) {
+        throw new Error(`x coordinate out of range`)
+    }
+
+    const x3 = F.multiply(F.multiply(x, x), x)
+    const y2 = F.add(x3, 7n)
+
+    // sqrt
+    let y = F.sqrt(y2)
+
+    if (head == 0x03) {
+        if (y % 2n == 0n) {
+            y = F.scale(y, -1n)
+        }
+    } else if (head == 0x02) {
+        if (y % 2n != 0n) {
+            y = F.scale(y, -1n)
+        }
+    } else {
+        throw new Error(`unexpected header byte ${head}`)
+    }
+
+    return { x, y }
+}
+
+/**
+ * @param {Point2<bigint>} point
+ * @returns {number[]}
+ */
+export function encodeECDSAPoint(point) {
+    const { x, y } = point
+
+    const head = y % 2n == 0n ? 0x02 : 0x03
+
+    return [head].concat(encodeScalar(x))
 }

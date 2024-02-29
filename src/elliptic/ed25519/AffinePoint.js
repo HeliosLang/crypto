@@ -2,6 +2,7 @@ import { getBit } from "@helios-lang/codec-utils"
 import { exp, invert, mod, scalePoint } from "../common/index.js"
 import { P, D, Gx, Gy, P38, SQRT2P14 } from "./constants.js"
 import { decodeScalar, encodeScalar } from "./codec.js"
+import { F } from "./field.js"
 
 /**
  * @template {Point<T>} T
@@ -70,13 +71,10 @@ export class AffinePoint {
         const finalBit = getBit(bytes, 255)
 
         const y2 = y * y
-        const x2 = (y2 - 1n) * invert(1n + D * y2, P)
+        const x2 = (y2 - 1n) * F.invert(1n + D * y2)
 
         // sqrt
-        let x = exp(x2, P38, P)
-        if (mod(x * x - x2, P) != 0n) {
-            x = (x * SQRT2P14) % P
-        }
+        let x = F.sqrt(x2)
 
         // if odd state not equal, make odd state same
         if (Number(x & 1n) != finalBit) {
@@ -113,10 +111,10 @@ export class AffinePoint {
 
         const dxxyy = D * x1 * x2 * y1 * y2
 
-        const x3 = (x1 * y2 + x2 * y1) * invert(1n + dxxyy, P)
-        const y3 = (y1 * y2 + x1 * x2) * invert(1n - dxxyy, P)
+        const x3 = F.multiply(x1 * y2 + x2 * y1, F.invert(1n + dxxyy))
+        const y3 = F.multiply(y1 * y2 + x1 * x2, F.invert(1n - dxxyy))
 
-        return new AffinePoint(mod(x3, P), mod(y3, P))
+        return new AffinePoint(x3, y3)
     }
 
     /**
@@ -124,7 +122,7 @@ export class AffinePoint {
      * @returns {boolean}
      */
     equals(other) {
-        return this.x == other.x && this.y == other.y
+        return F.equals(this.x, other.x) && F.equals(this.y, other.y)
     }
 
     /**
@@ -137,7 +135,7 @@ export class AffinePoint {
         const xx = x * x
         const yy = y * y
 
-        return mod(-xx + yy - 1n - D * xx * yy, P) == 0n // TODO: is mod missing from the inner ops?
+        return F.add(-xx + yy - 1n, -D * xx * yy) == 0n
     }
 
     /**
@@ -153,7 +151,7 @@ export class AffinePoint {
      * @returns {AffinePoint}
      */
     neg() {
-        return new AffinePoint(mod(-this.x, P), this.y)
+        return new AffinePoint(F.scale(this.x, -1n), this.y)
     }
 
     /**
