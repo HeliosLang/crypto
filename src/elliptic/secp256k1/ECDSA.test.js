@@ -1,11 +1,11 @@
 import { describe, it } from "node:test"
 import { deepEqual, strictEqual, throws } from "node:assert"
-import { bytesToHex, encodeUtf8, hexToBytes } from "@helios-lang/codec-utils"
+import { encodeUtf8, hexToBytes } from "@helios-lang/codec-utils"
 import { sha3_256 } from "../../digest/sha3_256.js"
 import { ECDSA, ECDSASecp256k1 as ecdsaExtended } from "./ECDSA.js"
-import { AffinePoint } from "./AffinePoint.js"
+import { affineCurve } from "./AffineCurve.js"
 
-const ecdsaAffine = new ECDSA(AffinePoint)
+const ecdsaAffine = new ECDSA(affineCurve)
 
 describe(`ECDSASecpp256k1 for message 'Message for ECDSA signing'`, () => {
     const message = "Message for ECDSA signing"
@@ -19,18 +19,6 @@ describe(`ECDSASecpp256k1 for message 'Message for ECDSA signing'`, () => {
     const expectedSignature = hexToBytes(
         "b83380f6e1d09411ebf49afd1a95c738686bfb2b0fe2391134f4ae3d6d77b78a6c305afcac930a3ea1721c04d8a1a979016baae011319746323a756fbaee1811"
     )
-
-    it("signs as #b8..11 using private key #79..4b", () => {
-        const signature = ecdsaExtended.sign(messageHash, privateKey)
-
-        deepEqual(signature, expectedSignature)
-    })
-
-    it("signs as #b8..11 using private key #79..4b (affine)", () => {
-        const signature = ecdsaAffine.sign(messageHash, privateKey)
-
-        deepEqual(signature, expectedSignature)
-    })
 
     it("generates publicKey #02..40 for privateKey #79..4b", () => {
         const publicKey = ecdsaExtended.derivePublicKey(privateKey)
@@ -50,6 +38,18 @@ describe(`ECDSASecpp256k1 for message 'Message for ECDSA signing'`, () => {
 
     it("fails for invalid privateKey", () => {
         throws(() => ecdsaExtended.derivePublicKey(new Array(32).fill(255)))
+    })
+
+    it("signs as #b8..11 using private key #79..4b", () => {
+        const signature = ecdsaExtended.sign(messageHash, privateKey)
+
+        deepEqual(signature, expectedSignature)
+    })
+
+    it("signs as #b8..11 using private key #79..4b (affine)", () => {
+        const signature = ecdsaAffine.sign(messageHash, privateKey)
+
+        deepEqual(signature, expectedSignature)
     })
 
     it("returns true when verifying #b8..11 is correct signature", () => {

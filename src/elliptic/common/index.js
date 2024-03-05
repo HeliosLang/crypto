@@ -2,23 +2,15 @@
  * Collection of types and functions needed when working with Elliptic curves (signing and zero-knowledge)
  */
 
-export { exp, invert, mod } from "./arithmetic.js"
-export { equalsExtended, scalePoint } from "./Point.js"
-export { CurveHelper } from "./CurveHelper.js"
-export { FieldHelper } from "./FieldHelper.js"
+export { mod } from "./mod.js"
+
+export { CubicFieldExt } from "./CubicFieldExt.js"
+export { CurveWithOps } from "./CurveWithOps.js"
+export { FieldWithOps } from "./FieldWithOps.js"
+export { QuadraticFieldExt } from "./QuadraticFieldExt.js"
 export { ScalarField } from "./ScalarField.js"
 export { ShortAffine } from "./ShortAffine.js"
 export { ShortProjected } from "./ShortProjected.js"
-
-/**
- * @template {Point<T>} T
- * @typedef {import("./Point.js").Point<T>} Point
- */
-
-/**
- * @template {Point<T>} T
- * @typedef {import("./Point.js").PointClass<T>} PointClass
- */
 
 /**
  * @template T
@@ -38,4 +30,15 @@ export { ShortProjected } from "./ShortProjected.js"
 /**
  * @template T
  * @typedef {import("./Curve.js").Curve<T>} Curve
+ */
+
+/**
+ * @template Tc
+ * @template T
+ * @typedef {import("./CurveWithFromToAffine.js").CurveWithFromToAffine<Tc, T>} CurveWithFromToAffine
+ */
+
+/**
+ * @template T
+ * @typedef {import("./Field.js").Field<T>} Field
  */

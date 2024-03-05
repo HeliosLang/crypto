@@ -1,4 +1,5 @@
-import { FieldHelper } from "./FieldHelper.js"
+import { CurveWithOps } from "./CurveWithOps.js"
+import { FieldWithOps } from "./FieldWithOps.js"
 
 /**
  * @template T
@@ -23,36 +24,34 @@ import { FieldHelper } from "./FieldHelper.js"
  * @template T bigint, [bigint, bigint] etc.
  * @implements {Curve<Point2<T>>}
  */
-export class ShortAffine {
+class ShortAffineInternal {
     /**
      * @readonly
-     * @type {Point2<T>}
-     */
-    ZERO
-
-    /**
-     * @readonly
-     * @type {FieldHelper<T>}
+     * @type {FieldWithOps<T>}
      */
     F
 
     /**
      * Coefficient of curve formula
-     * @private
      * @readonly
      * @type {T}
      */
     b
 
     /**
-     * @param {Point2<T>} ZERO
      * @param {Field<T>} F
      * @param {T} b
      */
-    constructor(ZERO, F, b) {
-        this.ZERO = ZERO
-        this.F = new FieldHelper(F)
-        this.b
+    constructor(F, b) {
+        this.F = new FieldWithOps(F)
+        this.b = b
+    }
+
+    /**
+     * @type {Point2<T>}
+     */
+    get ZERO() {
+        return { x: this.F.ZERO, y: this.F.ONE }
     }
 
     /**
@@ -109,27 +108,30 @@ export class ShortAffine {
      * @returns {Point2<T>}
      */
     double(point) {
-        const F = this.F
-        const { x, y } = point
+        if (this.equals(point, this.ZERO)) {
+            return point
+        } else {
+            const F = this.F
+            const { x, y } = point
 
-        const tx = F.scale(x, 2n)
-        const ty = F.scale(y, 2n)
+            const tx = F.scale(x, 2n)
+            const ty = F.scale(y, 2n)
 
-        const x2 = F.square(x)
-        const tyi = F.invert(ty)
+            const x2 = F.square(x)
+            const tyi = F.invert(ty)
 
-        const s = F.multiply(F.scale(x2, 3n), tyi)
-        const s2 = F.square(s)
+            const s = F.multiply(F.scale(x2, 3n), tyi)
+            const s2 = F.square(s)
 
-        const nx = F.subtract(s2, tx)
-        const ny = F.subtract(F.multiply(s, F.subtract(x, nx)), y)
+            const nx = F.subtract(s2, tx)
+            const ny = F.subtract(F.multiply(s, F.subtract(x, nx)), y)
 
-        return { x: nx, y: ny }
+            return { x: nx, y: ny }
+        }
     }
 
     /**
      * Taken from https://bitcoin.stackexchange.com/questions/119860/how-to-convert-the-results-of-point-doubling-rx1-and-ry1-to-point-addition-rx
-     * Edge cases taken from Elliptic.js library
      * @param {Point2<T>} a
      * @param {Point2<T>} b
      * @returns {Point2<T>}
@@ -137,19 +139,21 @@ export class ShortAffine {
     add(a, b) {
         const F = this.F
 
-        // P + P = 2P
         if (this.equals(a, b)) {
+            // a + a = 2a
             return this.double(a)
-        }
-
-        // P + (-P) = O
-        if (this.equals(this.negate(a), b)) {
+        } else if (this.equals(this.negate(a), b)) {
+            // a + (-a) = O
             return this.ZERO
-        }
-
-        // P + Q = O
-        if (F.add(a.x, b.x) == 0n) {
+        } else if (F.add(a.x, b.x) === 0n) {
+            // a + b = O
             return this.ZERO
+        } else if (this.equals(a, this.ZERO)) {
+            // 0 + b = b
+            return b
+        } else if (this.equals(b, this.ZERO)) {
+            // a + 0 = a
+            return a
         }
 
         const dx = F.subtract(a.x, b.x)
@@ -161,5 +165,43 @@ export class ShortAffine {
         const ny = F.subtract(F.multiply(s, F.subtract(a.x, nx)), a.y)
 
         return { x: nx, y: ny }
+    }
+}
+/**
+ * @template T
+ * @extends {CurveWithOps<Point2<T>, ShortAffineInternal<T>>}
+ */
+export class ShortAffine extends CurveWithOps {
+    /**
+     * @param {Field<T>} F
+     * @param {T} b
+     */
+    constructor(F, b) {
+        super(new ShortAffineInternal(F, b))
+    }
+
+    /**
+     * @type {T}
+     */
+    get b() {
+        return this.curve.b
+    }
+
+    /**
+     * This method makes it easier to swap out the affine curve for the projected curve
+     * @param {Point2<T>} point
+     * @returns {Point2<T>}
+     */
+    toAffine(point) {
+        return point
+    }
+
+    /**
+     * This method makes it easier to swap out the affine curve for the projected curve
+     * @param {Point2<T>} point
+     * @returns {Point2<T>}
+     */
+    fromAffine(point) {
+        return point
     }
 }

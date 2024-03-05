@@ -25,13 +25,11 @@
  * @typedef {{
  *   ZERO: T
  *   ONE: T
- *   add: (a: T, b: T) => T
+ *   add: (a: T, ...b: T[]) => T
  *   scale: (a: T, s: bigint) => T
  *   multiply: (a: T, b: T) => T
- *   pow: (a: T, p: bigint) => T
  *   equals: (a: T, b: T) => boolean
  *   invert: (a: T) => T
- *   sqrt: (a: T) => T
  * }} Field
  */
 

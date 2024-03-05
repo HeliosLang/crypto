@@ -1,67 +1,71 @@
-import { invert, mod } from "../common/index.js"
 import { hmacDrbg } from "../../rand/index.js"
 import {
     decodeScalar,
     decodePrivateKey,
     decodeMessageHash,
     decodeECDSASignature,
-    encodeSignature
+    encodeSignature,
+    encodeECDSAPoint,
+    decodeECDSAPoint
 } from "./codec.js"
-import { N } from "./constants.js"
-import { ExtendedPoint } from "./ExtendedPoint.js"
+import { G, N } from "./constants.js"
+import { Z } from "./field.js"
+import { projectedCurve } from "./ProjectedCurve.js"
 
 /**
- * @template {Point<T>} T
- * @typedef {import("../common/Point.js").Point<T>} Point
- */
-
-/**
- * @template {Point<T>} T
- * @typedef {import("../common/Point.js").PointClass<T>} PointClass
+ * @template Tc
+ * @template T
+ * @typedef {import("../common/index.js").CurveWithFromToAffine<Tc, T>} CurveWithFromToAffine
  */
 
 /**
  * The ECDSA algorithm is explained very well here: https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages
- * @template {Point<T>} T
+ * @template T
  */
 export class ECDSA {
     /**
-     *@type {PointClass<T>}
+     * @readonly
+     * @type {CurveWithFromToAffine<bigint, T>}
      */
-    #PointImpl
+    curve
 
     /**
-     *
-     * @param {PointClass<T>} CurvePointImpl
+     * @param {CurveWithFromToAffine<bigint, T>} curve
      */
-    constructor(CurvePointImpl) {
-        this.#PointImpl = CurvePointImpl
+    constructor(curve) {
+        this.curve = curve
     }
 
     /**
      * Derives a 33 byte public key from a 32 byte privateKey
-     * @param {number[]} privateKey
+     * @param {number[]} privateKeyBytes
      * @returns {number[]} 33 byte public key (first byte is evenOdd bit)
      */
-    derivePublicKey(privateKey) {
-        const x = decodePrivateKey(privateKey)
-        const h = this.#PointImpl.BASE.mul(x)
+    derivePublicKey(privateKeyBytes) {
+        const privateKey = decodePrivateKey(privateKeyBytes)
+        const publicKey = this.curve.scale(this.curve.fromAffine(G), privateKey)
 
-        return h.encode()
+        if (!this.curve.isValidPoint(publicKey)) {
+            throw new Error("public key not on curve")
+        }
+
+        const publicKeyBytes = encodeECDSAPoint(this.curve.toAffine(publicKey))
+
+        return publicKeyBytes
     }
 
     /**
      * Sign the 32 messageHash.
      * Even though this implementation isn't constant time, it isn't vulnerable to a timing attack (see detailed notes in the code).
      * @param {number[]} messageHash 32 bytes
-     * @param {number[]} privateKey 32 bytes
+     * @param {number[]} privateKeyBytes 32 bytes
      * @returns {number[]} 64 byte signature.
      */
-    sign(messageHash, privateKey) {
+    sign(messageHash, privateKeyBytes) {
         // Extract privateKey as integer
         //   (Not vulnerable to timing attack, because messageHash doesn't impact this,
         //     and same privateKey will probably always be used for repeated calls)
-        const x = decodePrivateKey(privateKey)
+        const privateKey = decodePrivateKey(privateKeyBytes)
 
         // Hash message
         const h1 = decodeMessageHash(messageHash)
@@ -69,7 +73,7 @@ export class ECDSA {
         // Generate a practically random number using hmacDrbg
         //   (Not vulnerable to timing attack, because seed is always
         //     the same length and sha2_256 timing only depends on length)
-        return hmacDrbg(privateKey.concat(messageHash), (kBytes) => {
+        return hmacDrbg(privateKeyBytes.concat(messageHash), (kBytes) => {
             const k = decodeScalar(kBytes)
 
             // if k is invalid => generate other kBytes
@@ -79,8 +83,8 @@ export class ECDSA {
 
             // First part of signature
             //   (Not vulnerable to timing attack because k is random, and the privateKey isn't involved)
-            const q = this.#PointImpl.BASE.mul(k).toAffine()
-            const r = mod(q.x, N)
+            const q = this.curve.scale(this.curve.fromAffine(G), k)
+            const r = Z.mod(this.curve.toAffine(q).x)
 
             // if r is invalid => generate other kBytes
             if (r === 0n) {
@@ -90,8 +94,8 @@ export class ECDSA {
             // Second part of signature
             //   (Not vulnerable to timing attack because even though x*r is non-constant time,
             //      and r is public, k is random and private and most the calculation time depends on k (for [k]BASE and k^-1))
-            const ik = invert(k, N) // this inversion is expensive, but only happens once if the ExtendedPoint implementation is used for [k]BASE)
-            let s = mod(ik * mod(h1 + mod(x * r, N), N), N)
+            const ik = Z.invert(k) // this inversion is expensive, but only happens once if the ExtendedPoint implementation is used for [k]BASE)
+            let s = Z.multiply(ik, Z.add(h1, Z.multiply(privateKey, r)))
 
             // If s is invalid => generate other kBytes
             if (s === 0n) {
@@ -100,7 +104,7 @@ export class ECDSA {
 
             // The plutus-core spec dictates the use of lowS
             if (s > N >> 1n) {
-                s = mod(-s, N)
+                s = Z.negate(s)
             }
 
             return encodeSignature(r, s)
@@ -112,12 +116,14 @@ export class ECDSA {
      * TODO: for invalid format inputs this method fails. Should it instead return `false` for some of these bad cases? (the plutus-core spec isn't clear at all)
      * @param {number[]} signature
      * @param {number[]} messageHash
-     * @param {number[]} publicKey
+     * @param {number[]} publicKeyBytes
      * @returns {boolean}
      */
-    verify(signature, messageHash, publicKey) {
-        if (publicKey.length != 33) {
-            throw new Error(`unexpected publickey length ${publicKey.length}`)
+    verify(signature, messageHash, publicKeyBytes) {
+        if (publicKeyBytes.length != 33) {
+            throw new Error(
+                `unexpected publickey length ${publicKeyBytes.length}`
+            )
         }
 
         const h1 = decodeMessageHash(messageHash)
@@ -128,15 +134,23 @@ export class ECDSA {
             return false
         }
 
-        const si = invert(s, N)
-        const u1 = mod(h1 * si, N)
-        const u2 = mod(r * si, N)
+        const si = Z.invert(s)
+        const u1 = Z.multiply(h1, si)
+        const u2 = Z.multiply(r, si)
 
-        const h = this.#PointImpl.decode(publicKey)
-        const R = this.#PointImpl.BASE.mul(u1).add(h.mul(u2)).toAffine()
+        const curve = this.curve
+        const publicKey = curve.fromAffine(decodeECDSAPoint(publicKeyBytes))
+        if (!curve.isValidPoint(publicKey)) {
+            throw new Error("publicKey not on curve")
+        }
 
-        return mod(R.x, N) === r
+        const R = curve.add(
+            curve.scale(curve.fromAffine(G), u1),
+            curve.scale(publicKey, u2)
+        )
+
+        return Z.mod(curve.toAffine(R).x) === r
     }
 }
 
-export const ECDSASecp256k1 = new ECDSA(ExtendedPoint)
+export const ECDSASecp256k1 = new ECDSA(projectedCurve)

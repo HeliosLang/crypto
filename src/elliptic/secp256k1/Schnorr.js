@@ -4,20 +4,29 @@ import { mod } from "../common/index.js"
 import {
     decodePrivateKey,
     decodeScalar,
+    decodeSchnorrPoint,
     decodeSchnorrSignature,
-    encodeScalar
+    encodeScalar,
+    encodeSchnorrPoint
 } from "./codec.js"
-import { N } from "./constants.js"
-import { ExtendedPoint } from "./ExtendedPoint.js"
+import { G, N } from "./constants.js"
+import { Z } from "./field.js"
+import { projectedCurve } from "./ProjectedCurve.js"
 
 /**
- * @template {Point<T>} T
- * @typedef {import("../common/index.js").Point<T>} Point
+ * @template Tc
+ * @template T
+ * @typedef {import("../common/index.js").CurveWithFromToAffine<Tc, T>} CurveWithFromToAffine
  */
 
 /**
- * @template {Point<T>} T
- * @typedef {import("../common/index.js").PointClass<T>} PointClass
+ * @template T
+ * @typedef {import("../common/index.js").Point2<T>} Point2
+ */
+
+/**
+ * @template T
+ * @typedef {import("../common/index.js").Point2<T>} Point3
  */
 
 /**
@@ -51,39 +60,42 @@ function hash(tag, bytes) {
 
 /**
  * See: https://bips.xyz/340
- * @template {Point<T>} T
+ * @template T
  */
 export class Schnorr {
     /**
-     * @type {PointClass<T>}
+     * @type {CurveWithFromToAffine<bigint, T>}
      */
-    #PointImpl
+    curve
 
     /**
-     * @param {PointClass<T>} PointImpl
+     * @param {CurveWithFromToAffine<bigint, T>} curve
      */
-    constructor(PointImpl) {
-        this.#PointImpl = PointImpl
+    constructor(curve) {
+        this.curve = curve
     }
 
     /**
-     * @param {number[]} privateKey
+     * @param {number[]} privateKeyBytes
      * @returns {number[]} 32 byte public key.
      */
-    derivePublicKey(privateKey) {
-        const d = decodePrivateKey(privateKey)
-        const h = this.#PointImpl.BASE.mul(d)
+    derivePublicKey(privateKeyBytes) {
+        const privateKey = decodePrivateKey(privateKeyBytes)
+        const publicKey = this.curve.scale(this.curve.fromAffine(G), privateKey)
+        const publicKeyBytes = encodeSchnorrPoint(
+            this.curve.toAffine(publicKey)
+        )
 
-        return h.encode().slice(1)
+        return publicKeyBytes
     }
 
     /**
      * @param {number[]} message any length
-     * @param {number[]} privateKey 32 bytes
+     * @param {number[]} privateKeyBytes 32 bytes
      * @param {number[]} nonce 32 bytes
      * @returns {number[]} 64 bytes
      */
-    sign(message, privateKey, nonce) {
+    sign(message, privateKeyBytes, nonce) {
         if (nonce.length != 32) {
             throw new Error(
                 `expected 32 bytes for nonce, got ${nonce.length} bytes`
@@ -92,29 +104,36 @@ export class Schnorr {
 
         // Extract private key
         //  (Not vulnerable to timing attack because no public data is used, and repeated calls will likely use the same privateKey)
-        let d = decodePrivateKey(privateKey)
+        let privateKey = decodePrivateKey(privateKeyBytes)
 
         // Public Key as a point
         //   (Not vulnerable to timing attack because not public data is used)
-        const h = this.#PointImpl.BASE.mul(d)
+        const publicKey = this.curve.scale(this.curve.fromAffine(G), privateKey)
 
-        if (h.isZero()) {
-            throw new Error("unexpected publicKey point")
+        if (this.curve.isZero(publicKey)) {
+            throw new Error(
+                `unexpected publicKey point ${JSON.stringify(publicKey)}`
+            )
         }
 
-        // Correct d for uneven y
-        if (h.toAffine().y % 2n != 0n) {
-            d = N - d
-            privateKey = encodeScalar(d)
+        // Correct privateKey for uneven y
+        if (this.curve.toAffine(publicKey).y % 2n != 0n) {
+            privateKey = Z.negate(privateKey)
+            privateKeyBytes = encodeScalar(privateKey)
         }
 
         const nonceHash = hash("BIP0340/aux", nonce)
 
         // Not vulnerable to timing attack because this should be constant-time
-        const t = nonceHash.map((b, i) => privateKey[i] ^ b)
+        const t = nonceHash.map((b, i) => privateKeyBytes[i] ^ b)
 
-        const hBytes = h.encode().slice(1)
-        const rand = hash("BIP0340/nonce", t.concat(hBytes.concat(message)))
+        const publicKeyBytes = encodeSchnorrPoint(
+            this.curve.toAffine(publicKey)
+        )
+        const rand = hash(
+            "BIP0340/nonce",
+            t.concat(publicKeyBytes.concat(message))
+        )
 
         let k = mod(decodeScalar(rand), N)
 
@@ -123,25 +142,27 @@ export class Schnorr {
         }
 
         // k is random and private, and this calculation dominates the calculation time of this method
-        const R = this.#PointImpl.BASE.mul(k)
+        const R = this.curve.scale(this.curve.fromAffine(G), k)
 
-        if (R.isZero()) {
+        if (this.curve.isZero(R)) {
             throw new Error("failed to sign")
         }
 
-        if (R.toAffine().y % 2n != 0n) {
+        if (this.curve.toAffine(R).y % 2n != 0n) {
             k = N - k
         }
 
-        const Rbytes = R.encode().slice(1)
+        const Rbytes = encodeSchnorrPoint(this.curve.toAffine(R))
         const eBytes = hash(
             "BIP0340/challenge",
-            Rbytes.concat(hBytes).concat(message)
+            Rbytes.concat(publicKeyBytes).concat(message)
         )
 
         const e = mod(decodeScalar(eBytes), N)
 
-        const signature = Rbytes.concat(encodeScalar(mod(k + mod(e * d, N), N)))
+        const signature = Rbytes.concat(
+            encodeScalar(mod(k + mod(e * privateKey, N), N))
+        )
 
         return signature
     }
@@ -151,33 +172,40 @@ export class Schnorr {
      * TODO: for invalid format inputs this method fails. Should it instead return `false` for some of these bad cases? (the plutus-core spec isn't clear at all)
      * @param {number[]} signature
      * @param {number[]} message
-     * @param {number[]} publicKey
+     * @param {number[]} publicKeyBytes
      * @returns {boolean}
      */
-    verify(signature, message, publicKey) {
-        const h = this.#PointImpl.decode([0x02].concat(publicKey))
+    verify(signature, message, publicKeyBytes) {
+        const publicKey = this.curve.fromAffine(
+            decodeSchnorrPoint(publicKeyBytes)
+        )
+
+        if (!this.curve.isValidPoint(publicKey)) {
+            throw new Error("publicKey not on curve")
+        }
+
         const [r, s] = decodeSchnorrSignature(signature)
 
         const eBytes = hash(
             "BIP0340/challenge",
-            encodeScalar(r).concat(publicKey).concat(message)
+            encodeScalar(r).concat(publicKeyBytes).concat(message)
         )
         const e = mod(decodeScalar(eBytes), N)
 
-        const a = this.#PointImpl.BASE.mul(s)
-        const b = h.mul(N - e)
-        const R = a.add(b)
+        const a = this.curve.scale(this.curve.fromAffine(G), s)
+        const b = this.curve.scale(publicKey, Z.negate(e))
+        const R = this.curve.add(a, b)
 
-        if (R.isZero()) {
+        if (this.curve.isZero(R)) {
             throw new Error("failed to verify (bad R)")
         }
 
-        if (R.toAffine().y % 2n != 0n) {
+        if (this.curve.toAffine(R).y % 2n != 0n) {
             throw new Error("failed to verify (uneven R.y)")
         }
 
-        return R.toAffine().x == r
+        return this.curve.toAffine(R).x == r
     }
 }
 
-export const SchnorrSecp256k1 = new Schnorr(ExtendedPoint)
+export const SchnorrSecp256k1 = new Schnorr(projectedCurve)

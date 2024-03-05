@@ -1,17 +1,18 @@
 import { sha2_512 } from "../../digest/index.js"
-import { mod } from "../common/index.js"
-import { ExtendedPoint } from "./ExtendedPoint.js"
-import { decodeScalar, decodePrivateKey, encodeScalar } from "./codec.js"
-import { N } from "./constants.js"
+import { ExtendedCurve } from "./ExtendedCurve.js"
+import {
+    decodeScalar,
+    decodePrivateKey,
+    encodeScalar,
+    encodePoint,
+    decodePoint
+} from "./codec.js"
+import { G } from "./constants.js"
+import { Z } from "./field.js"
 
 /**
- * @template {Point<T>} T
- * @typedef {import("../common/index.js").Point<T>} Point
- */
-
-/**
- * @template {Point<T>} T
- * @typedef {import("../common/index.js").PointClass<T>} CurvePointClass
+ * @template T
+ * @typedef {import("./Ed25519Curve.js").Ed25519Curve<T>} Ed25519Curve
  */
 
 const hash = sha2_512
@@ -80,20 +81,20 @@ const hash = sha2_512
  *
  * The arithmatic details are handled by the CurvePoint class
  *
- * @template {Point<T>} T
+ * @template T
  */
 export class EdDSA {
     /**
-     * @type {CurvePointClass<T>}
+     * @type {Ed25519Curve<T>}
      */
-    #PointImpl
+    curve
 
     /**
      *
-     * @param {CurvePointClass<T>} impl
+     * @param {Ed25519Curve<T>} curve
      */
-    constructor(impl) {
-        this.#PointImpl = impl
+    constructor(curve) {
+        this.curve = curve
     }
 
     /**
@@ -107,42 +108,43 @@ export class EdDSA {
     }
 
     /**
-     * @param {number[]} privateKey
+     * @param {number[]} privateKeyBytes
      * @param {boolean} hashPrivateKey - defaults to true, set to false when used in Bip32 algorithm
      * @returns {number[]} 32 byte public key.
      */
-    derivePublicKey(privateKey, hashPrivateKey = true) {
+    derivePublicKey(privateKeyBytes, hashPrivateKey = true) {
         if (hashPrivateKey) {
-            privateKey = hash(privateKey)
+            privateKeyBytes = hash(privateKeyBytes)
         } else {
-            if (privateKey.length != 64) {
+            if (privateKeyBytes.length != 64) {
                 throw new Error(
-                    `expected extended privateKey with a length of 64 bytes, this privateKey is ${privateKey.length} bytes long (hint: pass hashPrivateKey = true)`
+                    `expected extended privateKey with a length of 64 bytes, this privateKey is ${privateKeyBytes.length} bytes long (hint: pass hashPrivateKey = true)`
                 )
             }
         }
 
-        const x = decodePrivateKey(privateKey)
-        const h = this.#PointImpl.BASE.mul(x)
+        const privateKey = decodePrivateKey(privateKeyBytes)
+        const publicKey = this.curve.scale(this.curve.fromAffine(G), privateKey)
+        const publicKeyBytes = encodePoint(this.curve.toAffine(publicKey))
 
-        return h.encode()
+        return publicKeyBytes
     }
 
     /**
      * Sign the message.
      * Even though this implementation isn't constant time, it isn't vulnerable to a timing attack (see detailed notes in the code)
      * @param {number[]} message
-     * @param {number[]} privateKey
+     * @param {number[]} privateKeyBytes
      * @param {boolean} hashPrivateKey - defaults to true, Bip32 passes this as false
      * @returns {number[]} 64 byte signature.
      */
-    sign(message, privateKey, hashPrivateKey = true) {
+    sign(message, privateKeyBytes, hashPrivateKey = true) {
         if (hashPrivateKey) {
-            privateKey = hash(privateKey)
+            privateKeyBytes = hash(privateKeyBytes)
         } else {
-            if (privateKey.length != 64) {
+            if (privateKeyBytes.length != 64) {
                 throw new Error(
-                    `expected extended privateKey with a length of 64 bytes, this privateKey is ${privateKey.length} bytes long (hint: pass hashPrivateKey = true)`
+                    `expected extended privateKey with a length of 64 bytes, this privateKey is ${privateKeyBytes.length} bytes long (hint: pass hashPrivateKey = true)`
                 )
             }
         }
@@ -150,22 +152,23 @@ export class EdDSA {
         // Extract privateKey as integer
         //   (Not vulnerable to timing attack because there is no mixing with the message,
         //      so always takes the same amount of time for the same privateKey)
-        const x = decodePrivateKey(privateKey)
+        const privateKey = decodePrivateKey(privateKeyBytes)
 
         // For convenience calculate publicKey here
         //   (Not vulnerable to timing attack because there is no mixing with the message,
         //      so always takes the same amount of time for the same privateKey)
-        const publicKey = this.#PointImpl.BASE.mul(x).encode()
+        const publicKey = this.curve.scale(this.curve.fromAffine(G), privateKey)
+        const publicKeyBytes = encodePoint(this.curve.toAffine(publicKey))
 
         // Generate a practically random number
         //   (Not vulnerable to timing attack because sha2_512 runtime only depends on message length,
         //     so timing doesn't expose any bytes of the privateKey)
-        const k = this.oneWay(privateKey.slice(32, 64).concat(message))
+        const k = this.oneWay(privateKeyBytes.slice(32, 64).concat(message))
 
         // First part of the signature
         //   (Not vulnerable to timing attack because variations in the message create huge random variations in k)
-        const a = this.#PointImpl.BASE.mul(k)
-        const aEncoded = a.encode()
+        const a = this.curve.scale(this.curve.fromAffine(G), k)
+        const aEncoded = encodePoint(this.curve.toAffine(a))
 
         // Second part of the signature
         //   (Not vulnerable to timing attack.
@@ -173,8 +176,8 @@ export class EdDSA {
         //      and the f * x operation isn't constant time (bigint ops in JS aren't constant time),
         //      k also changes with each message, and the [k]BASE operation above
         //      is much more expensive than multiplying two big ints)
-        const f = this.oneWay(aEncoded.concat(publicKey).concat(message))
-        const b = mod(k + f * x, N)
+        const f = this.oneWay(aEncoded.concat(publicKeyBytes).concat(message))
+        const b = Z.add(k, f * privateKey)
         const bEncoded = encodeScalar(b)
 
         return aEncoded.concat(bEncoded)
@@ -192,19 +195,29 @@ export class EdDSA {
             throw new Error(`unexpected signature length ${signature.length}`)
         }
 
-        const a = this.#PointImpl.decode(signature.slice(0, 32))
+        const a = this.curve.fromAffine(decodePoint(signature.slice(0, 32)))
+
+        if (!this.curve.isValidPoint(a)) {
+            throw new Error("first part of signature not on curve")
+        }
+
         const b = decodeScalar(signature.slice(32, 64))
 
-        const h = this.#PointImpl.decode(publicKey)
+        const h = this.curve.fromAffine(decodePoint(publicKey))
+
+        if (!this.curve.isValidPoint(h)) {
+            throw new Error("public key not on curve")
+        }
+
         const f = this.oneWay(
             signature.slice(0, 32).concat(publicKey).concat(message)
         )
 
-        const left = this.#PointImpl.BASE.mul(b)
-        const right = a.add(h.mul(f))
+        const left = this.curve.scale(this.curve.fromAffine(G), b)
+        const right = this.curve.add(a, this.curve.scale(h, f))
 
-        return left.equals(right)
+        return this.curve.equals(left, right)
     }
 }
 
-export const Ed25519 = new EdDSA(ExtendedPoint)
+export const Ed25519 = new EdDSA(new ExtendedCurve())

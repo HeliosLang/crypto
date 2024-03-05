@@ -1,14 +1,27 @@
+import { CurveWithOps } from "./CurveWithOps.js"
+import { FieldWithOps } from "./FieldWithOps.js"
+
 /**
  * @template T
  * @typedef {import("./Curve.js").Curve<T>} Curve
  */
 
-import { FieldHelper } from "./FieldHelper.js"
+/**
+ * @template Tc
+ * @template T
+ * @typedef {import("./CurveWithFromToAffine.js").CurveWithFromToAffine<Tc, T>} CurveWithFromToAffine
+ */
 
 /**
  * @template T
  * @typedef {import("./Field.js").Field<T>} Field
  */
+
+/**
+ * @template T
+ * @typedef {import("./Point2.js").Point2<T>} Point2
+ */
+
 /**
  * @template T
  * @typedef {import("./Point3.js").Point3<T>} Point3
@@ -20,18 +33,60 @@ import { FieldHelper } from "./FieldHelper.js"
  *    x' = x/z and y' = y/z
  *    z*y^2 = x^3 + b*z^3 (ignoring `a` which will be zero in all relevant cases for Cardano)
  * @template T bigint or [bigint, bigint]
- * @implements {Curve<Point3<T>>}
+ * @extends {CurveWithOps<Point3<T>, ShortProjectedInternal<T>>}
+ * @implements {CurveWithFromToAffine<T, Point3<T>>}
  */
-export class ShortProjected {
+export class ShortProjected extends CurveWithOps {
     /**
-     * @readonly
-     * @type {Point3<T>}
+     * @param {Field<T>} F
+     * @param {T} b
      */
-    ZERO
+    constructor(F, b) {
+        super(new ShortProjectedInternal(F, b))
+    }
 
     /**
+     * @param {Point2<T>} point
+     * @returns {Point3<T>}
+     */
+    fromAffine(point) {
+        const F = this.curve.F
+
+        if (F.isZero(point.x) && F.isOne(point.y)) {
+            return this.ZERO
+        } else {
+            return { ...point, z: F.ONE }
+        }
+    }
+
+    /**
+     * @param {Point3<T>} point
+     * @returns {Point2<T>}
+     */
+    toAffine(point) {
+        const F = this.curve.F
+
+        if (this.equals(point, this.ZERO)) {
+            return { x: F.ZERO, y: F.ONE }
+        } else {
+            const zInverse = F.invert(point.z)
+
+            return {
+                x: F.multiply(point.x, zInverse),
+                y: F.multiply(point.y, zInverse)
+            }
+        }
+    }
+}
+
+/**
+ * @template T
+ * @implements {Curve<Point3<T>>}
+ */
+class ShortProjectedInternal {
+    /**
      * @readonly
-     * @type {FieldHelper<T>}
+     * @type {FieldWithOps<T>}
      */
     F
 
@@ -44,14 +99,20 @@ export class ShortProjected {
     b
 
     /**
-     * @param {Point3<T>} ZERO
      * @param {Field<T>} F
      * @param {T} b
      */
-    constructor(ZERO, F, b) {
-        this.ZERO = ZERO
-        this.F = new FieldHelper(F)
+    constructor(F, b) {
+        this.F = new FieldWithOps(F)
         this.b = b
+    }
+
+    /**
+     * Using y == 1n instead of y == 0n makes the equals() method faster (no special checks needed for the ZERO case)
+     * @type {Point3<T>}
+     */
+    get ZERO() {
+        return { x: this.F.ZERO, y: this.F.ONE, z: this.F.ZERO }
     }
 
     /**
@@ -97,10 +158,14 @@ export class ShortProjected {
      * @returns {Point3<T>}
      */
     negate(point) {
-        return {
-            x: point.x,
-            y: this.F.negate(point.y),
-            z: point.z
+        if (this.equals(point, this.ZERO)) {
+            return point
+        } else {
+            return {
+                x: point.x,
+                y: this.F.negate(point.y),
+                z: point.z
+            }
         }
     }
 
@@ -112,70 +177,76 @@ export class ShortProjected {
      * @returns {Point3<T>}
      */
     add(point1, point2) {
-        const F = this.F
+        if (this.equals(point1, this.ZERO)) {
+            return point2
+        } else if (this.equals(point2, this.ZERO)) {
+            return point1
+        } else {
+            const F = this.F
 
-        const { x: x1, y: y1, z: z1 } = point1
-        const { x: x2, y: y2, z: z2 } = point2
+            const { x: x1, y: y1, z: z1 } = point1
+            const { x: x2, y: y2, z: z2 } = point2
 
-        /**
-         * @type {T}
-         */
-        let x3
+            /**
+             * @type {T}
+             */
+            let x3
 
-        /**
-         * @type {T}
-         */
-        let y3
+            /**
+             * @type {T}
+             */
+            let y3
 
-        /**
-         * @type {T}
-         */
-        let z3
+            /**
+             * @type {T}
+             */
+            let z3
 
-        const b3 = F.scale(this.b, 3n)
+            const b3 = F.scale(this.b, 3n)
 
-        // reuse the following temporary variables in order to have more concise lines of code
-        let t0 = F.multiply(x1, x2)
-        let t1 = F.multiply(y1, y2)
-        let t2 = F.multiply(z1, z2)
-        let t3 = F.add(x1, y1)
-        let t4 = F.add(x2, y2)
-        let t5 = F.add(x2, z2)
+            // reuse the following temporary variables in order to have more concise lines of code
+            let t0 = F.multiply(x1, x2)
+            let t1 = F.multiply(y1, y2)
+            let t2 = F.multiply(z1, z2)
+            let t3 = F.add(x1, y1)
+            let t4 = F.add(x2, y2)
+            let t5 = F.add(x2, z2)
 
-        t3 = F.multiply(t3, t4)
-        t4 = F.add(t0, t1)
-        t3 = F.subtract(t3, t4)
-        t4 = F.add(x1, z1)
-        t5 = F.add(t0, t2)
-        t4 = F.multiply(t4, t5)
+            t3 = F.multiply(t3, t4)
+            t4 = F.add(t0, t1)
+            t3 = F.subtract(t3, t4)
+            t4 = F.add(x1, z1)
+            t4 = F.multiply(t4, t5)
+            t5 = F.add(t0, t2)
 
-        t4 = F.subtract(t4, t5)
-        t5 = F.add(y1, z1)
-        x3 = F.add(y2, z2)
-        t5 = F.multiply(t5, x3)
-        x3 = F.add(t1, t2)
-        t5 = F.subtract(t5, x3)
-        x3 = F.multiply(b3, t2)
-        z3 = x3
-        x3 = F.subtract(t1, z3)
-        z3 = F.add(t1, z3)
-        y3 = F.multiply(x3, z3)
-        t1 = F.add(t0, t0)
-        t1 = F.add(t1, t0)
-        t4 = F.multiply(b3, t4)
-        t0 = F.multiply(t1, t4)
-        y3 = F.add(y3, t0)
-        t0 = F.multiply(t5, t4)
-        x3 = F.multiply(t3, x3)
-        x3 = F.subtract(x3, t0)
-        t0 = F.multiply(t3, t1)
-        z3 = F.multiply(t5, z3)
-        z3 = F.add(z3, t0)
+            t4 = F.subtract(t4, t5)
+            t5 = F.add(y1, z1)
+            x3 = F.add(y2, z2)
+            t5 = F.multiply(t5, x3)
+            x3 = F.add(t1, t2)
+            t5 = F.subtract(t5, x3)
+            x3 = F.multiply(b3, t2)
+            z3 = x3
+            x3 = F.subtract(t1, z3)
+            z3 = F.add(t1, z3)
+            y3 = F.multiply(x3, z3)
+            t1 = F.add(t0, t0)
+            t1 = F.add(t1, t0)
+            t4 = F.multiply(b3, t4)
+            t0 = F.multiply(t1, t4)
+            y3 = F.add(y3, t0)
+            t0 = F.multiply(t5, t4)
+            x3 = F.multiply(t3, x3)
+            x3 = F.subtract(x3, t0)
+            t0 = F.multiply(t3, t1)
+            z3 = F.multiply(t5, z3)
+            z3 = F.add(z3, t0)
 
-        return {
-            x: x3,
-            y: y3,
-            z: z3
+            return {
+                x: x3,
+                y: y3,
+                z: z3
+            }
         }
     }
 }

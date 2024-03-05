@@ -5,26 +5,29 @@
 
 /**
  * @template T
+ * @template {Curve<T>} [C=Curve<T>]
  * @implements {Curve<T>}
  */
-export class CurveHelper {
+export class CurveWithOps {
     /**
-     * @type {Curve<T>}
+     * @readonly
+     * @protected
+     * @type {C}
      */
-    #curve
+    curve
 
     /**
-     * @param {Curve<T>} curve
+     * @param {C} curve
      */
     constructor(curve) {
-        this.#curve = curve
+        this.curve = curve
     }
 
     /**
      * @type {T}
      */
     get ZERO() {
-        return this.#curve.ZERO
+        return this.curve.ZERO
     }
 
     /**
@@ -32,7 +35,7 @@ export class CurveHelper {
      * @returns {boolean}
      */
     isZero(point) {
-        return this.#curve.equals(this.#curve.ZERO, point)
+        return this.curve.equals(this.curve.ZERO, point)
     }
 
     /**
@@ -40,7 +43,7 @@ export class CurveHelper {
      * @returns {boolean}
      */
     isValidPoint(point) {
-        return this.#curve.isValidPoint(point)
+        return this.curve.isValidPoint(point)
     }
 
     /**
@@ -49,7 +52,7 @@ export class CurveHelper {
      * @returns {boolean}
      */
     equals(a, b) {
-        return this.#curve.equals(a, b)
+        return this.curve.equals(a, b)
     }
 
     /**
@@ -58,7 +61,16 @@ export class CurveHelper {
      * @returns {T}
      */
     add(a, b) {
-        return this.#curve.add(a, b)
+        return this.curve.add(a, b)
+    }
+
+    /**
+     * @param {T} a
+     * @param {T} b
+     * @returns {T}
+     */
+    subtract(a, b) {
+        return this.curve.add(a, this.curve.negate(b))
     }
 
     /**
@@ -66,7 +78,7 @@ export class CurveHelper {
      * @returns {T}
      */
     negate(a) {
-        return this.#curve.negate(a)
+        return this.curve.negate(a)
     }
 
     /**
@@ -79,18 +91,19 @@ export class CurveHelper {
      */
     scale(point, s) {
         if (s == 0n) {
-            return this.#curve.ZERO
+            console.log("scale returning 0")
+            return this.curve.ZERO
         } else if (s == 1n) {
             return point
         } else if (s < 0n) {
-            return this.scale(this.#curve.negate(point), -s)
+            return this.scale(this.curve.negate(point), -s)
         } else {
             let sum = this.scale(point, s / 2n)
 
-            sum = this.#curve.add(sum, sum)
+            sum = this.curve.add(sum, sum)
 
             if (s % 2n != 0n) {
-                sum = this.#curve.add(sum, point)
+                sum = this.curve.add(sum, point)
             }
 
             return sum

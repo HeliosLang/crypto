@@ -1,4 +1,9 @@
 /**
+ * @template T
+ * @typedef {import("./Field.js").Field<T>} Field
+ */
+
+/**
  * Abstraction of an additive group
  *   * ZERO: additive identity
  *   * add two points to form a new point

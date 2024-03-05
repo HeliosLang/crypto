@@ -175,3 +175,19 @@ export function encodeECDSAPoint(point) {
 
     return [head].concat(encodeScalar(x))
 }
+
+/**
+ * @param {number[]} bytes
+ * @returns {Point2<bigint>}
+ */
+export function decodeSchnorrPoint(bytes) {
+    return decodeECDSAPoint([0x02].concat(bytes))
+}
+
+/**
+ * @param {Point2<bigint>} point
+ * @returns {number[]}
+ */
+export function encodeSchnorrPoint(point) {
+    return encodeECDSAPoint(point).slice(1)
+}
