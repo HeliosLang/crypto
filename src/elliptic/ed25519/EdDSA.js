@@ -185,6 +185,13 @@ export class EdDSA {
 
     /**
      * Returns `true` if the signature is correct.
+     * Returns `false`:
+     *   * if the signature is incorrect
+     *   * if the signature doesn't lie on the curve,
+     *   * if the publicKey doesn't lie on the curve
+     * Throw an error:
+     *   * signature isn't 64 bytes long
+     *   * publickey isn't 32 bytes long (asserted inside `decodePoint()`)
      * @param {number[]} signature
      * @param {number[]} message
      * @param {number[]} publicKey
@@ -198,7 +205,7 @@ export class EdDSA {
         const a = this.curve.fromAffine(decodePoint(signature.slice(0, 32)))
 
         if (!this.curve.isValidPoint(a)) {
-            throw new Error("first part of signature not on curve")
+            return false
         }
 
         const b = decodeScalar(signature.slice(32, 64))
@@ -206,7 +213,7 @@ export class EdDSA {
         const h = this.curve.fromAffine(decodePoint(publicKey))
 
         if (!this.curve.isValidPoint(h)) {
-            throw new Error("public key not on curve")
+            return false
         }
 
         const f = this.oneWay(
