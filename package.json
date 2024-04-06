@@ -3,6 +3,7 @@
     "version": "0.1.4",
     "description": "Cryptography primitives used throughout HeliosLang codebase",
     "main": "src/index.js",
+    "types": "src/index.d.ts",
     "type": "module",
     "scripts": {
         "build": "npm run prettify && npm run build:types && npm run test:suite",
