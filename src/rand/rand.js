@@ -4,6 +4,21 @@
  */
 
 /**
+ * @param {NumberGenerator} generator
+ * @param {number} n
+ * @returns {number[]}
+ */
+export function generateBytes(generator, n) {
+    const key = []
+
+    for (let i = 0; i < n; i++) {
+        key.push(Math.floor(generator() * 256) % 256)
+    }
+
+    return key
+}
+
+/**
  * A simple pseudo-random number generator for use in tests that requires some randomness but need to be deterministic
  * (i.e. each test run gives the same result).
  * @param {number} seed
