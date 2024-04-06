@@ -3,6 +3,7 @@
         "checkJs": true,
         "declaration": true,
         "declarationMap": true,
+        "declarationDir": "types",
         "skipLibCheck": true,
         "strictNullChecks": true,
         "noImplicitThis": true,
