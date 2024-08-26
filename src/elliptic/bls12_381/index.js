@@ -13,3 +13,8 @@ export {
 } from "./codec.js"
 export { F12 } from "./fields/index.js"
 export { finalVerify, millerLoop } from "./pairing.js"
+
+/**
+ * @template T
+ * @typedef {import("../common/index.js").Point2<T>} Point2
+ */
