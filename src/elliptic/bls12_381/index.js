@@ -12,7 +12,7 @@ export {
     encodeG2Point
 } from "./codec.js"
 export { F12 } from "./fields/index.js"
-export { finalVerify, millerLoop } from "./pairing.js"
+export { finalExponentiate, finalVerify, millerLoop } from "./pairing.js"
 
 /**
  * @typedef {import("./fields/index.js").FieldElement12} FieldElement12

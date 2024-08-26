@@ -171,9 +171,9 @@ export function millerLoopInternal([ax, ay], bs) {
 
 /**
  * @param {FieldElement12} res
- * @returns {boolean}
+ * @returns {FieldElement12}
  */
-export function finalVerify(res) {
+export function finalExponentiate(res) {
     const x = CURVEx
 
     let t0 = F12.divide(F12.powp(res, 6), res) // res^(p^6) / res
@@ -191,9 +191,21 @@ export function finalVerify(res) {
     t7 = F12.multiply(F12.multiply(t7, F12.conjugate(t3)), t1)
 
     // (t2 * t5)^(p^2) * (t4 * t1)^(q^2) * (t6 * t1.conj)^p * t7 * t3.conj * t1
-    res = F12.multiply(F12.multiply(F12.multiply(t2, t4), t6), t7)
+    return F12.multiply(F12.multiply(F12.multiply(t2, t4), t6), t7)
+}
 
-    return F12.equals(res, F12.ONE)
+/**
+ * @param {FieldElement12} a
+ * @param {FieldElement12} b
+ * @returns {boolean}
+ */
+export function finalVerify(a, b) {
+    // first calculate a/b
+    const c = F12.multiply(a, F12.invert(b))
+
+    const cFinal = finalExponentiate(c)
+
+    return F12.equals(cFinal, F12.ONE)
 }
 
 /**
