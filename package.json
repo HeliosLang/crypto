@@ -25,10 +25,10 @@
     },
     "devDependencies": {
         "@types/node": "^20.10.4",
-        "prettier": "^3.1.0",
+        "prettier": "^3.3.3",
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@helios-lang/codec-utils": "^0.1.30"
+        "@helios-lang/codec-utils": "^0.1.35"
     }
 }
