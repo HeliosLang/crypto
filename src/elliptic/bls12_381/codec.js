@@ -31,9 +31,13 @@ export function decodeG1Point(bytes) {
 
     if (head & 0b01000000) {
         if (head != 0b11000000) {
-            throw new Error("invalid zero representation, 3rd header bit not 0)")
-        } else if (bytes.slice(1).some(b => b != 0)) {
-            throw new Error("invalid zero representation, some non-header bits not 0")
+            throw new Error(
+                "invalid zero representation, 3rd header bit not 0)"
+            )
+        } else if (bytes.slice(1).some((b) => b != 0)) {
+            throw new Error(
+                "invalid zero representation, some non-header bits not 0"
+            )
         }
 
         return G1.ZERO
@@ -84,9 +88,13 @@ export function decodeG2Point(bytes) {
 
     if ((head & 0b01000000) != 0) {
         if (head != 0b11000000) {
-            throw new Error("invalid zero representation, 3rd header bit not 0)")
-        } else if (bytes.slice(1).some(b => b != 0)) {
-            throw new Error("invalid zero representation, some non-header bits not 0")
+            throw new Error(
+                "invalid zero representation, 3rd header bit not 0)"
+            )
+        } else if (bytes.slice(1).some((b) => b != 0)) {
+            throw new Error(
+                "invalid zero representation, some non-header bits not 0"
+            )
         }
 
         return G2.ZERO
