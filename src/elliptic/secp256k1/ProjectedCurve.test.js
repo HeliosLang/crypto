@@ -1,5 +1,5 @@
-import { describe, it } from "node:test"
 import { strictEqual } from "node:assert"
+import { describe, it } from "node:test"
 import { projectedCurve } from "./ProjectedCurve.js"
 import { G as GAffine } from "./constants.js"
 

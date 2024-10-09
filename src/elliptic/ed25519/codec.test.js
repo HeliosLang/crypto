@@ -1,7 +1,7 @@
-import { describe, it } from "node:test"
-import { decodePrivateKey } from "./codec.js"
 import { strictEqual } from "node:assert"
+import { describe, it } from "node:test"
 import { hexToBytes } from "@helios-lang/codec-utils"
+import { decodePrivateKey } from "./codec.js"
 
 describe(decodePrivateKey.name, () => {
     const privateKeyHash = hexToBytes(

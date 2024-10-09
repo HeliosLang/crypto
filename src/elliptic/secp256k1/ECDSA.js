@@ -1,4 +1,5 @@
 import { hmacDrbg } from "../../rand/index.js"
+import { projectedCurve } from "./ProjectedCurve.js"
 import {
     decodeScalar,
     decodePrivateKey,
@@ -10,7 +11,6 @@ import {
 } from "./codec.js"
 import { G, N } from "./constants.js"
 import { Z } from "./field.js"
-import { projectedCurve } from "./ProjectedCurve.js"
 
 /**
  * @template Tc

@@ -1,7 +1,7 @@
-import { describe, it } from "node:test"
-import { decodeG1Point } from "./codec.js"
 import { throws } from "node:assert"
+import { describe, it } from "node:test"
 import { hexToBytes } from "@helios-lang/codec-utils"
+import { decodeG1Point } from "./codec.js"
 
 describe(decodeG1Point.name, () => {
     it("fails for invalid zero 1 (first bit isn't 1)", () => {

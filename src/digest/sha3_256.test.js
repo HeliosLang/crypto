@@ -1,7 +1,7 @@
-import { describe, it } from "node:test"
-import { sha3_256 } from "./sha3_256.js"
 import { strictEqual } from "node:assert"
+import { describe, it } from "node:test"
 import { bytesToHex, encodeUtf8 } from "@helios-lang/codec-utils"
+import { sha3_256 } from "./sha3_256.js"
 
 /**
  * Taken from https://www.di-mgt.com.au/sha_testvectors.html

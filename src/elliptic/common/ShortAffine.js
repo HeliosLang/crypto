@@ -3,12 +3,12 @@ import { FieldWithOps } from "./FieldWithOps.js"
 
 /**
  * @template T
- * @typedef {import("./Field.js").Field<T>} Field
+ * @typedef {import("./Curve.js").Curve<T>} Curve
  */
 
 /**
  * @template T
- * @typedef {import("./Curve.js").Curve<T>} Curve
+ * @typedef {import("./Field.js").Field<T>} Field
  */
 
 /**

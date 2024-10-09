@@ -1,12 +1,12 @@
+import { deepEqual, strictEqual, throws } from "node:assert"
 import { describe, it } from "node:test"
+import { bytesToHex, hexToBytes } from "@helios-lang/codec-utils"
 import {
     decodeMessageHash,
     decodePrivateKey,
     decodeECDSASignature,
     encodeSignature
 } from "./codec.js"
-import { bytesToHex, hexToBytes } from "@helios-lang/codec-utils"
-import { deepEqual, strictEqual, throws } from "node:assert"
 
 describe(decodeMessageHash.name, () => {
     it(`decodes #6b..f9 as 484..409n`, () => {

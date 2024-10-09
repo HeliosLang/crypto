@@ -1,8 +1,8 @@
-import { describe, it } from "node:test"
 import { deepEqual, strictEqual, throws } from "node:assert"
+import { describe, it } from "node:test"
 import { hexToBytes } from "@helios-lang/codec-utils"
-import { Schnorr, SchnorrSecp256k1 as schnorrExtended } from "./Schnorr.js"
 import { affineCurve } from "./AffineCurve.js"
+import { Schnorr, SchnorrSecp256k1 as schnorrExtended } from "./Schnorr.js"
 
 const schnorrAffine = new Schnorr(affineCurve)
 

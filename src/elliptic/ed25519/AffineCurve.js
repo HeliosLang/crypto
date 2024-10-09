@@ -4,12 +4,12 @@ import { F } from "./field.js"
 
 /**
  * @template T
- * @typedef {import("../common/index.js").Point2<T>} Point2
+ * @typedef {import("../common/index.js").Curve<T>} Curve
  */
 
 /**
  * @template T
- * @typedef {import("../common/index.js").Curve<T>} Curve
+ * @typedef {import("../common/index.js").Point2<T>} Point2
  */
 
 /**

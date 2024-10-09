@@ -1,15 +1,15 @@
+import { FieldWithOps } from "../../common/index.js"
 import { CURVE1 } from "../constants.js"
-import { F1, F2 } from "../fields/index.js"
 import {
     projectedCurve1 as G1,
     projectedCurve2 as G2
 } from "../curves/index.js"
-import { hashToField } from "./hashToField.js"
+import { F1, F2 } from "../fields/index.js"
 import {
     ISOGENY_COEFFICIENTS_G1,
     ISOGENY_COEFFICIENTS_G2
 } from "./constants.js"
-import { FieldWithOps } from "../../common/index.js"
+import { hashToField } from "./hashToField.js"
 
 /**
  * @template T

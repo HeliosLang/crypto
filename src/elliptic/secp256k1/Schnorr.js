@@ -1,6 +1,7 @@
 import { encodeUtf8 } from "@helios-lang/codec-utils"
 import { sha2_256 } from "../../digest/index.js"
 import { mod } from "../common/index.js"
+import { projectedCurve } from "./ProjectedCurve.js"
 import {
     decodePrivateKey,
     decodeScalar,
@@ -11,7 +12,6 @@ import {
 } from "./codec.js"
 import { G, N } from "./constants.js"
 import { Z } from "./field.js"
-import { projectedCurve } from "./ProjectedCurve.js"
 
 /**
  * @template Tc

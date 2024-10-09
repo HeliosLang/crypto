@@ -1,7 +1,7 @@
-import { describe, it } from "node:test"
-import { keccak_256 } from "./keccak_256.js"
 import { strictEqual } from "node:assert"
+import { describe, it } from "node:test"
 import { bytesToHex, hexToBytes } from "@helios-lang/codec-utils"
+import { keccak_256 } from "./keccak_256.js"
 
 /**
  * Each entry: first item is the hex message, second item is the resulting hash

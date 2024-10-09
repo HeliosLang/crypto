@@ -1,6 +1,6 @@
+import { strictEqual } from "node:assert"
 import { describe, it } from "node:test"
 import { rand } from "./rand.js"
-import { strictEqual } from "node:assert"
 
 describe(rand.name, () => {
     it("99.9% unique numbers (1_000_000 runs)", () => {

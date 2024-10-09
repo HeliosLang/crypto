@@ -1,15 +1,6 @@
-import { CurveWithOps } from "../common/index.js"
 import { CURVE1 } from "./constants.js"
 import { affineCurve1 as G1, affineCurve2 as G2 } from "./curves/index.js"
-import { F2, F12, F1 } from "./fields/index.js"
-
-/**
- * @typedef {import("./fields/index.js").FieldElement6} FieldElement6
- */
-
-/**
- * @typedef {import("./fields/index.js").FieldElement12} FieldElement12
- */
+import { F2, F12 } from "./fields/index.js"
 
 /**
  * @template T
@@ -19,6 +10,11 @@ import { F2, F12, F1 } from "./fields/index.js"
 /**
  * @template T
  * @typedef {import("../common/index.js").Point3<T>} Point3
+ */
+
+/**
+ * @typedef {import("./fields/index.js").FieldElement6} FieldElement6
+ * @typedef {import("./fields/index.js").FieldElement12} FieldElement12
  */
 
 /**
