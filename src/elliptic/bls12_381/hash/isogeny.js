@@ -1,4 +1,3 @@
-import { FieldWithOps } from "../../common/index.js"
 import { CURVE1 } from "../constants.js"
 import {
     projectedCurve1 as G1,
@@ -11,6 +10,10 @@ import {
 } from "./constants.js"
 import { hashToField } from "./hashToField.js"
 
+/**
+ * @template T
+ * @typedef {import("../../common/index.js").FieldWithOpsI<T>} FieldWithOpsI
+ */
 /**
  * @template T
  * @typedef {import("../../common/index.js").Point2<T>} Point2
@@ -204,7 +207,7 @@ function isogenyMapG2(point) {
 
 /**
  * @template T
- * @param {FieldWithOps<T>} F
+ * @param {FieldWithOpsI<T>} F
  * @param {[T[], T[], T[], T[]]} coeffs
  * @param {Point2<T>} point
  * @returns {Point2<T>}

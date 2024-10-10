@@ -14,22 +14,12 @@ export { ShortProjected } from "./ShortProjected.js"
 
 /**
  * @template T
- * @typedef {import("./Point2.js").Point2<T>} Point2
- */
-
-/**
- * @template T
- * @typedef {import("./Point3.js").Point3<T>} Point3
- */
-
-/**
- * @template T
- * @typedef {import("./Point4.js").Point4<T>} Point4
- */
-
-/**
- * @template T
  * @typedef {import("./Curve.js").Curve<T>} Curve
+ */
+
+/**
+ * @template T
+ * @typedef {import("./CurveWithOps.js").CurveWithOpsI<T>} CurveWithOpsI
  */
 
 /**
@@ -41,4 +31,24 @@ export { ShortProjected } from "./ShortProjected.js"
 /**
  * @template T
  * @typedef {import("./Field.js").Field<T>} Field
+ */
+
+/**
+ * @template T
+ * @typedef {import("./FieldWithOps.js").FieldWithOpsI<T>} FieldWithOpsI
+ */
+
+/**
+ * @template T
+ * @typedef {import("./Point2.js").Point2<T>} Point2
+ */
+
+/**
+ * @template T
+ * @typedef {import("./Point3.js").Point3<T>} Point3
+ */
+
+/**
+ * @template T
+ * @typedef {import("./Point4.js").Point4<T>} Point4
  */

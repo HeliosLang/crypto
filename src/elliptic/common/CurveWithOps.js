@@ -5,8 +5,17 @@
 
 /**
  * @template T
+ * @typedef {Curve<T> & {
+ *   isZero(point: T): boolean
+ *   subtract(a: T, b: T): T
+ *   scale(point: T, s: bigint): T
+ * }} CurveWithOpsI
+ */
+
+/**
+ * @template T
  * @template {Curve<T>} [C=Curve<T>]
- * @implements {Curve<T>}
+ * @implements {CurveWithOps<T>}
  */
 export class CurveWithOps {
     /**

@@ -1,8 +1,11 @@
-import { FieldWithOps } from "./FieldWithOps.js"
-
 /**
  * @template T
  * @typedef {import("./Field.js").Field<T>} Field
+ */
+
+/**
+ * @template T
+ * @typedef {import("./FieldWithOps.js").FieldWithOpsI<T>} FieldWithOpsI
  */
 
 /**
@@ -14,7 +17,7 @@ export class QuadraticFieldExt {
     /**
      * Field used for each component
      * @readonly
-     * @type {FieldWithOps<T>}
+     * @type {FieldWithOpsI<T>}
      */
     F
 
@@ -26,7 +29,7 @@ export class QuadraticFieldExt {
     U2
 
     /**
-     * @param {FieldWithOps<T>} F applied to each part separately
+     * @param {FieldWithOpsI<T>} F applied to each part separately
      * @param {T} U2
      */
     constructor(F, U2) {

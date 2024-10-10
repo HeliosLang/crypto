@@ -7,6 +7,10 @@
 import { UInt64 } from "@helios-lang/codec-utils"
 
 /**
+ * @typedef {import("@helios-lang/codec-utils").UInt64I} UInt64I
+ */
+
+/**
  * State width (1600 bits, )
  * @type {number}
  */
@@ -44,7 +48,7 @@ const SHIFTS = [
 
 /**
  * Round constants used in the sha3 permute function
- * @type {UInt64[]}
+ * @type {UInt64I[]}
  */
 const RC = [
     new UInt64(0x00000000, 0x00000001),
@@ -112,16 +116,16 @@ function pad(src, padByte) {
 
 /**
  * Change `s` in-place
- * @param {UInt64[]} s
+ * @param {UInt64I[]} s
  */
 function permute(s) {
     /**
-     * @type {UInt64[]}
+     * @type {UInt64I[]}
      */
     const c = new Array(5)
 
     /**
-     * @type {UInt64[]}
+     * @type {UInt64I[]}
      */
     const b = new Array(25)
 
@@ -186,7 +190,7 @@ export function keccakInternal(bytes, padByte) {
 
     /**
      * Initialize the state
-     * @type {UInt64[]}
+     * @type {UInt64I[]}
      */
     const state = new Array(WIDTH / 8).fill(UInt64.zero())
 

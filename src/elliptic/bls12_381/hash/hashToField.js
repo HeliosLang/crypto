@@ -1,4 +1,4 @@
-import { decodeIntBE, encodeIntBE, encodeUtf8 } from "@helios-lang/codec-utils"
+import { decodeIntBE, encodeIntBE } from "@helios-lang/codec-utils"
 import { sha2_256 } from "../../../digest/index.js"
 import { CURVE1 } from "../constants.js"
 
@@ -23,7 +23,7 @@ function i2osp(x, n) {
  * a and b must be of equal length
  * @param {number[]} a
  * @param {number[]} b
- * @return {number[]}
+ * @returns {number[]}
  */
 function strxor(a, b) {
     if (a.length != b.length) {
@@ -95,7 +95,6 @@ function expandMessage(msg, dst, n) {
 }
 
 const L = Math.ceil((381 + 128) / 8)
-const DST = encodeUtf8("asd")
 
 /**
  * @param {number[]} msg

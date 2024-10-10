@@ -4,6 +4,22 @@
  */
 
 /**
+ * @template T
+ * @typedef {Field<T> & {
+ *   isZero(a: T): boolean
+ *   isOne(a: T): boolean
+ *   mod(a: T): T
+ *   subtract(a: T, b: T): T
+ *   negate(a: T): T
+ *   square(a: T): T
+ *   cube(a: T): T
+ *   divide(a: T, b: T): T
+ *   pow(a: T, p: bigint): T
+ *   halve(a: T): T
+ * }} FieldWithOpsI
+ */
+
+/**
  * Defines additional operations on a field (which use the basic operations as building blocks)
  *   * isZero(a)
  *   * isOne(a)
@@ -17,7 +33,7 @@
  *   * halve(a)
  *
  * @template T
- * @implements {Field<T>}
+ * @implements {FieldWithOpsI<T>}
  */
 export class FieldWithOps {
     /**

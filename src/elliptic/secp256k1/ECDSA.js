@@ -19,8 +19,19 @@ import { Z } from "./field.js"
  */
 
 /**
+ * @template T
+ * @typedef {{
+ *   curve: CurveWithFromToAffine<bigint, T>
+ *   derivePublicKey(privateKeyBytes: number[]): number[]
+ *   sign(messageHash: number[], privateKeyBytes: number[]): number[]
+ *   verify(signature: number[], messageHash: number[], publicKeyByes: number[]): boolean
+ * }} ECDSA_I
+ */
+
+/**
  * The ECDSA algorithm is explained very well here: https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages
  * @template T
+ * @implements {ECDSA_I<T>}
  */
 export class ECDSA {
     /**

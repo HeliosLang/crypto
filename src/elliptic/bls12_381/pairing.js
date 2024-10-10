@@ -133,6 +133,7 @@ function getXBit(i) {
  *
  * @param {[bigint, bigint]} a
  * @param {FieldElement6[]} bs
+ * @returns {FieldElement12}
  */
 export function millerLoopInternal([ax, ay], bs) {
     const Px = ax

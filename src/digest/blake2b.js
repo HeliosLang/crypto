@@ -1,6 +1,10 @@
 import { UInt64 } from "@helios-lang/codec-utils"
 
 /**
+ * @typedef {import("@helios-lang/codec-utils").UInt64I} UInt64I
+ */
+
+/**
  * 128 bytes (16*8 byte words)
  * @type {number}
  */
@@ -52,8 +56,8 @@ function pad(src) {
 }
 
 /**
- * @param {UInt64[]} v
- * @param {UInt64[]} chunk
+ * @param {UInt64I[]} v
+ * @param {UInt64I[]} chunk
  * @param {number} a - index
  * @param {number} b - index
  * @param {number} c - index
@@ -76,8 +80,8 @@ function mix(v, chunk, a, b, c, d, i, j) {
 }
 
 /**
- * @param {UInt64[]} h - state vector
- * @param {UInt64[]} chunk
+ * @param {UInt64I[]} h - state vector
+ * @param {UInt64I[]} chunk
  * @param {number} t - chunkEnd (expected to fit in uint32)
  * @param {boolean} last
  */
