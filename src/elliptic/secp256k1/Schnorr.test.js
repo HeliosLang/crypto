@@ -2,9 +2,9 @@ import { deepEqual, strictEqual, throws } from "node:assert"
 import { describe, it } from "node:test"
 import { hexToBytes } from "@helios-lang/codec-utils"
 import { affineCurve } from "./AffineCurve.js"
-import { Schnorr, SchnorrSecp256k1 as schnorrExtended } from "./Schnorr.js"
+import { SchnorrSecp256k1 as schnorrExtended, makeSchnorr } from "./Schnorr.js"
 
-const schnorrAffine = new Schnorr(affineCurve)
+const schnorrAffine = makeSchnorr({ curve: affineCurve })
 
 describe(`SchnorrSecpp256k1 for message 'Message for ECDSA signing'`, () => {
     const message = hexToBytes(

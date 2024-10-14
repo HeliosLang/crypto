@@ -1,4 +1,4 @@
-import { ShortProjected } from "../../common/index.js"
+import { ShortProjectedImpl } from "../../common/index.js"
 import { CURVE1 } from "../constants.js"
 import { F2, F12, F6 } from "../fields/index.js"
 
@@ -13,6 +13,11 @@ import { F2, F12, F6 } from "../fields/index.js"
 
 /**
  * @typedef {import("../fields/index.js").FieldElement12} FieldElement12
+ */
+
+/**
+ * @template {bigint | [bigint, bigint]} T
+ * @typedef {import("../../common/index.js").ShortProjected<T>} ShortProjected
  */
 
 /**
@@ -40,9 +45,19 @@ const PSI2_C1 =
     0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaacn
 
 /**
- * @extends {ShortProjected<[bigint, bigint]>}
+ * @typedef {ShortProjected<[bigint, bigint]> & {
+ *   scalex(point: Point3<[bigint, bigint]>): Point3<[bigint, bigint]>
+ *   psi(point: Point3<[bigint, bigint]>): Point3<[bigint, bigint]>
+ *   psi2(point: Point3<[bigint, bigint]>): Point3<[bigint, bigint]>
+ *   clearCofactor(point: Point3<[bigint, bigint]>): Point3<[bigint, bigint]>
+ * }} ProjectedCurve2
  */
-class ProjectedCurve2 extends ShortProjected {
+
+/**
+ * @implements {ProjectedCurve2}
+ * @extends {ShortProjectedImpl<[bigint, bigint]>}
+ */
+class ProjectedCurve2Impl extends ShortProjectedImpl {
     constructor() {
         super(F2, [4n, 4n])
     }
@@ -90,22 +105,25 @@ class ProjectedCurve2 extends ShortProjected {
      * Maps the point into the prime-order subgroup G2.
      * clear_cofactor_bls12381_g2 from cfrg-hash-to-curve-11
      * https://eprint.iacr.org/2017/419.pdf
-     * @param {Point3<[bigint, bigint]>} P
+     * @param {Point3<[bigint, bigint]>} point
      * @returns {Point3<[bigint, bigint]>}
      */
-    clearCofactor(P) {
-        let t1 = this.scalex(P) // [-x]P
-        let t2 = this.psi(P) // Ψ(P)
-        let t3 = this.add(P, P) // 2P
+    clearCofactor(point) {
+        let t1 = this.scalex(point) // [-x]P
+        let t2 = this.psi(point) // Ψ(P)
+        let t3 = this.add(point, point) // 2P
         t3 = this.psi2(t3) // Ψ²(2P)
         t3 = this.subtract(t3, t2) // Ψ²(2P) - Ψ(P)
         t2 = this.add(t1, t2) // [-x]P + Ψ(P)
         t2 = this.scalex(t2) // [x²]P - [x]Ψ(P)
         t3 = this.add(t3, t2) // Ψ²(2P) - Ψ(P) + [x²]P - [x]Ψ(P)
         t3 = this.subtract(t3, t1) // Ψ²(2P) - Ψ(P) + [x²]P - [x]Ψ(P) + [x]P
-        const Q = this.subtract(t3, P) // Ψ²(2P) - Ψ(P) + [x²]P - [x]Ψ(P) + [x]P - 1P =>
+        const Q = this.subtract(t3, point) // Ψ²(2P) - Ψ(P) + [x²]P - [x]Ψ(P) + [x]P - 1P =>
         return Q // [x²-x-1]P + [x-1]Ψ(P) + Ψ²(2P)
     }
 }
 
-export const projectedCurve2 = new ProjectedCurve2()
+/**
+ * @type {ProjectedCurve2}
+ */
+export const projectedCurve2 = new ProjectedCurve2Impl()

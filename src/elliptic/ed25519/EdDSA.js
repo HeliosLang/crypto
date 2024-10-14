@@ -1,5 +1,5 @@
 import { sha2_512 } from "../../digest/index.js"
-import { ExtendedCurve } from "./ExtendedCurve.js"
+import { ExtendedCurveImpl } from "./ExtendedCurve.js"
 import {
     decodeScalar,
     decodePrivateKey,
@@ -9,6 +9,11 @@ import {
 } from "./codec.js"
 import { G } from "./constants.js"
 import { Z } from "./field.js"
+
+/**
+ * @template T
+ * @typedef {import("../common/index.js").Point4<T>} Point4
+ */
 
 /**
  * @template T
@@ -82,8 +87,28 @@ const hash = sha2_512
  * The arithmatic details are handled by the CurvePoint class
  *
  * @template T
+ * @typedef {{
+ *   curve: Ed25519Curve<T>
+ *   derivePublicKey(privateKeyBytes: number[], hashPrivateKey?: boolean): number[]
+ *   sign(message: number[], privateKeyBytes: number[], hashPrivateKey?: boolean): number[]
+ *   verify(signature: number[], message: number[], publicKey: number[]): boolean
+ * }} EdDSA
  */
-export class EdDSA {
+
+/**
+ * @template T
+ * @param {{curve: Ed25519Curve<T>}} args
+ * @returns {EdDSA<T>}
+ */
+export function makeEdDSA(args) {
+    return new EdDSAImpl(args.curve)
+}
+
+/**
+ * @template T
+ * @implements {EdDSA<T>}
+ */
+class EdDSAImpl {
     /**
      * @type {Ed25519Curve<T>}
      */
@@ -227,4 +252,7 @@ export class EdDSA {
     }
 }
 
-export const Ed25519 = new EdDSA(new ExtendedCurve())
+/**
+ * @type {EdDSA<Point4<bigint>>}
+ */
+export const Ed25519 = makeEdDSA({ curve: new ExtendedCurveImpl() })

@@ -9,7 +9,7 @@
  *   isZero(point: T): boolean
  *   subtract(a: T, b: T): T
  *   scale(point: T, s: bigint): T
- * }} CurveWithOpsI
+ * }} CurveWithOps
  */
 
 /**
@@ -17,7 +17,7 @@
  * @template {Curve<T>} [C=Curve<T>]
  * @implements {CurveWithOps<T>}
  */
-export class CurveWithOps {
+export class CurveWithOpsImpl {
     /**
      * @readonly
      * @protected

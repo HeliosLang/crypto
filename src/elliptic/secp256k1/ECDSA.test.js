@@ -3,9 +3,9 @@ import { describe, it } from "node:test"
 import { encodeUtf8, hexToBytes } from "@helios-lang/codec-utils"
 import { sha3_256 } from "../../digest/sha3_256.js"
 import { affineCurve } from "./AffineCurve.js"
-import { ECDSA, ECDSASecp256k1 as ecdsaExtended } from "./ECDSA.js"
+import { ECDSASecp256k1 as ecdsaExtended, makeECDSA } from "./ECDSA.js"
 
-const ecdsaAffine = new ECDSA(affineCurve)
+const ecdsaAffine = makeECDSA({ curve: affineCurve })
 
 describe(`ECDSASecpp256k1 for message 'Message for ECDSA signing'`, () => {
     const message = "Message for ECDSA signing"

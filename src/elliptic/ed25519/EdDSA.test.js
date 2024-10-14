@@ -1,10 +1,23 @@
-import { describe, it } from "node:test"
 import { deepEqual, strictEqual } from "node:assert"
+import { describe, it } from "node:test"
 import { encodeUtf8, hexToBytes } from "@helios-lang/codec-utils"
 import { AffineCurve } from "./AffineCurve.js"
-import { EdDSA, Ed25519 as ed25519Extended } from "./EdDSA.js"
+import { Ed25519 as ed25519Extended, makeEdDSA } from "./EdDSA.js"
 
-const ed25519Affine = new EdDSA(new AffineCurve())
+/**
+ * @template T
+ * @typedef {import("../common/index.js").Point2<T>} Point2
+ */
+
+/**
+ * @template T
+ * @typedef {import("./EdDSA.js").EdDSA<T>} EdDSA
+ */
+
+/**
+ * @type {EdDSA<Point2<bigint>>}
+ */
+const ed25519Affine = makeEdDSA({ curve: new AffineCurve() })
 
 describe('Ed25519 for ""', () => {
     // not the extended privateKey!

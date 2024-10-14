@@ -1,4 +1,4 @@
-import { CubicFieldExt, FieldWithOps } from "../../common/index.js"
+import { CubicFieldExt, FieldWithOpsImpl } from "../../common/index.js"
 import { F2 } from "./F2.js"
 
 /**
@@ -57,9 +57,9 @@ const V2POWP = [
 ]
 
 /**
- * @extends {FieldWithOps<FieldElement6>}
+ * @extends {FieldWithOpsImpl<FieldElement6>}
  */
-class FieldWithPowp extends FieldWithOps {
+class FieldWithPowp extends FieldWithOpsImpl {
     constructor() {
         super(new CubicFieldExt(F2, [1n, 1n]))
     }

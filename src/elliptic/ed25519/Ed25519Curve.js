@@ -2,7 +2,7 @@ export {}
 
 /**
  * @template T
- * @typedef {import("../common/index.js").CurveWithOpsI<T>} CurveWithOpsI
+ * @typedef {import("../common/index.js").CurveWithOps<T>} CurveWithOps
  */
 
 /**
@@ -12,7 +12,7 @@ export {}
 
 /**
  * @template T
- * @typedef {CurveWithOpsI<T> & {
+ * @typedef {CurveWithOps<T> & {
  *   toAffine: (point: T) => Point2<bigint>
  *   fromAffine: (point: Point2<bigint>) => T
  * }} Ed25519Curve

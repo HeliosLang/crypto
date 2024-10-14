@@ -1,5 +1,10 @@
-import { FieldWithOps, ScalarField } from "../common/index.js"
+import { FieldWithOpsImpl, ScalarField } from "../common/index.js"
 import { N, P } from "./constants.js"
+
+/**
+ * @template T
+ * @typedef {import("../common/index.js").FieldWithOps<T>} FieldWithOps
+ */
 
 // (P + 3n)/8n
 const P38 =
@@ -10,10 +15,17 @@ const SQRT2P14 =
     19681161376707505956807079304988542015446066515923890162744021073123829784752n
 
 /**
- * Field for coordinate operations
- * @extends {FieldWithOps<bigint>}
+ * @typedef {FieldWithOps<bigint> & {
+ *   sqrt(a: bigint): bigint
+ * }} WithSqrt
  */
-class WithSqrt extends FieldWithOps {
+
+/**
+ * Field for coordinate operations
+ * @implements {WithSqrt}
+ * @extends {FieldWithOpsImpl<bigint>}
+ */
+class WithSqrtImpl extends FieldWithOpsImpl {
     constructor() {
         super(new ScalarField(P))
     }
@@ -35,6 +47,12 @@ class WithSqrt extends FieldWithOps {
     }
 }
 
-export const F = new WithSqrt()
+/**
+ * @type {WithSqrt}
+ */
+export const F = new WithSqrtImpl()
 
-export const Z = new FieldWithOps(new ScalarField(N))
+/**
+ * @type {FieldWithOps<bigint>}
+ */
+export const Z = new FieldWithOpsImpl(new ScalarField(N))

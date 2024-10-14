@@ -1,7 +1,7 @@
-import { UInt64 } from "@helios-lang/codec-utils"
+import { makeUInt64, makeUInt64Fast } from "@helios-lang/codec-utils"
 
 /**
- * @typedef {import("@helios-lang/codec-utils").UInt64I} UInt64I
+ * @typedef {import("@helios-lang/codec-utils").UInt64} UInt64
  */
 
 /**
@@ -14,14 +14,14 @@ const WIDTH = 128
  * Initialization vector
  */
 const IV = [
-    new UInt64(0x6a09e667, 0xf3bcc908),
-    new UInt64(0xbb67ae85, 0x84caa73b),
-    new UInt64(0x3c6ef372, 0xfe94f82b),
-    new UInt64(0xa54ff53a, 0x5f1d36f1),
-    new UInt64(0x510e527f, 0xade682d1),
-    new UInt64(0x9b05688c, 0x2b3e6c1f),
-    new UInt64(0x1f83d9ab, 0xfb41bd6b),
-    new UInt64(0x5be0cd19, 0x137e2179)
+    makeUInt64Fast(0x6a09e667, 0xf3bcc908),
+    makeUInt64Fast(0xbb67ae85, 0x84caa73b),
+    makeUInt64Fast(0x3c6ef372, 0xfe94f82b),
+    makeUInt64Fast(0xa54ff53a, 0x5f1d36f1),
+    makeUInt64Fast(0x510e527f, 0xade682d1),
+    makeUInt64Fast(0x9b05688c, 0x2b3e6c1f),
+    makeUInt64Fast(0x1f83d9ab, 0xfb41bd6b),
+    makeUInt64Fast(0x5be0cd19, 0x137e2179)
 ]
 
 const SIGMA = [
@@ -56,8 +56,8 @@ function pad(src) {
 }
 
 /**
- * @param {UInt64I[]} v
- * @param {UInt64I[]} chunk
+ * @param {UInt64[]} v
+ * @param {UInt64[]} chunk
  * @param {number} a - index
  * @param {number} b - index
  * @param {number} c - index
@@ -80,8 +80,8 @@ function mix(v, chunk, a, b, c, d, i, j) {
 }
 
 /**
- * @param {UInt64I[]} h - state vector
- * @param {UInt64I[]} chunk
+ * @param {UInt64[]} h - state vector
+ * @param {UInt64[]} chunk
  * @param {number} t - chunkEnd (expected to fit in uint32)
  * @param {boolean} last
  */
@@ -89,11 +89,11 @@ function compress(h, chunk, t, last) {
     // work vectors
     const v = h.slice().concat(IV.slice())
 
-    v[12] = v[12].xor(new UInt64(0, t >>> 0)) // v[12].high unmodified
+    v[12] = v[12].xor(makeUInt64Fast(0, t >>> 0)) // v[12].high unmodified
     // v[13] unmodified
 
     if (last) {
-        v[14] = v[14].xor(new UInt64(0xffffffff, 0xffffffff))
+        v[14] = v[14].xor(makeUInt64Fast(0xffffffff, 0xffffffff))
     }
 
     for (let round = 0; round < 12; round++) {
@@ -157,7 +157,7 @@ export function blake2b(bytes, digestSize = 32) {
     const paramBlockView = new DataView(paramBlock.buffer)
     for (let i = 0; i < 8; i++) {
         h[i] = h[i].xor(
-            new UInt64(
+            makeUInt64Fast(
                 paramBlockView.getUint32(i * 8 + 4, true),
                 paramBlockView.getUint32(i * 8, true)
             )
@@ -172,7 +172,7 @@ export function blake2b(bytes, digestSize = 32) {
         const chunk64 = new Array(WIDTH / 8)
 
         for (let i = 0; i < WIDTH; i += 8) {
-            chunk64[i / 8] = UInt64.fromBytes(chunk.slice(i, i + 8))
+            chunk64[i / 8] = makeUInt64({ bytes: chunk.slice(i, i + 8) })
         }
 
         if (chunkStart == bytes.length - WIDTH) {

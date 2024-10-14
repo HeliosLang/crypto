@@ -5,12 +5,12 @@
 export { mod } from "./mod.js"
 
 export { CubicFieldExt } from "./CubicFieldExt.js"
-export { CurveWithOps } from "./CurveWithOps.js"
-export { FieldWithOps } from "./FieldWithOps.js"
+export { CurveWithOpsImpl } from "./CurveWithOps.js"
+export { FieldWithOpsImpl } from "./FieldWithOps.js"
 export { QuadraticFieldExt } from "./QuadraticFieldExt.js"
 export { ScalarField } from "./ScalarField.js"
-export { ShortAffine } from "./ShortAffine.js"
-export { ShortProjected } from "./ShortProjected.js"
+export { ShortAffineImpl } from "./ShortAffine.js"
+export { ShortProjectedImpl } from "./ShortProjected.js"
 
 /**
  * @template T
@@ -19,7 +19,7 @@ export { ShortProjected } from "./ShortProjected.js"
 
 /**
  * @template T
- * @typedef {import("./CurveWithOps.js").CurveWithOpsI<T>} CurveWithOpsI
+ * @typedef {import("./CurveWithOps.js").CurveWithOps<T>} CurveWithOps
  */
 
 /**
@@ -35,7 +35,7 @@ export { ShortProjected } from "./ShortProjected.js"
 
 /**
  * @template T
- * @typedef {import("./FieldWithOps.js").FieldWithOpsI<T>} FieldWithOpsI
+ * @typedef {import("./FieldWithOps.js").FieldWithOps<T>} FieldWithOps
  */
 
 /**
@@ -51,4 +51,14 @@ export { ShortProjected } from "./ShortProjected.js"
 /**
  * @template T
  * @typedef {import("./Point4.js").Point4<T>} Point4
+ */
+
+/**
+ * @template T
+ * @typedef {import("./ShortAffine.js").ShortAffine<T>} ShortAffine
+ */
+
+/**
+ * @template {bigint | [bigint, bigint]} T
+ * @typedef {import("./ShortProjected.js").ShortProjected<T>} ShortProjected
  */

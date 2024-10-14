@@ -1,4 +1,4 @@
-import { FieldWithOps, QuadraticFieldExt } from "../../common/index.js"
+import { FieldWithOpsImpl, QuadraticFieldExt } from "../../common/index.js"
 import { CURVE1 } from "../constants.js"
 import { F1 } from "./F1.js"
 
@@ -50,9 +50,9 @@ const ETAs = [
 ]
 
 /**
- * @extends {FieldWithOps<[bigint, bigint]>}
+ * @extends {FieldWithOpsImpl<[bigint, bigint]>}
  */
-class FieldWithExtraOps extends FieldWithOps {
+class FieldWithExtraOps extends FieldWithOpsImpl {
     constructor() {
         super(new QuadraticFieldExt(F1, -1n))
     }

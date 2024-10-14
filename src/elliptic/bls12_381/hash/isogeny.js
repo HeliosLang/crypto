@@ -12,7 +12,7 @@ import { hashToField } from "./hashToField.js"
 
 /**
  * @template T
- * @typedef {import("../../common/index.js").FieldWithOpsI<T>} FieldWithOpsI
+ * @typedef {import("../../common/index.js").FieldWithOps<T>} FieldWithOps
  */
 /**
  * @template T
@@ -207,7 +207,7 @@ function isogenyMapG2(point) {
 
 /**
  * @template T
- * @param {FieldWithOpsI<T>} F
+ * @param {FieldWithOps<T>} F
  * @param {[T[], T[], T[], T[]]} coeffs
  * @param {Point2<T>} point
  * @returns {Point2<T>}

@@ -4,10 +4,14 @@
  * Keccak_256 refers to the older implementation, using 0x01 as a padByte (Sha3 uses 0x06 as a padyte)
  */
 
-import { UInt64 } from "@helios-lang/codec-utils"
+import {
+    UINT64_ZERO,
+    makeUInt64,
+    makeUInt64Fast
+} from "@helios-lang/codec-utils"
 
 /**
- * @typedef {import("@helios-lang/codec-utils").UInt64I} UInt64I
+ * @typedef {import("@helios-lang/codec-utils").UInt64} UInt64
  */
 
 /**
@@ -48,33 +52,33 @@ const SHIFTS = [
 
 /**
  * Round constants used in the sha3 permute function
- * @type {UInt64I[]}
+ * @type {UInt64[]}
  */
 const RC = [
-    new UInt64(0x00000000, 0x00000001),
-    new UInt64(0x00000000, 0x00008082),
-    new UInt64(0x80000000, 0x0000808a),
-    new UInt64(0x80000000, 0x80008000),
-    new UInt64(0x00000000, 0x0000808b),
-    new UInt64(0x00000000, 0x80000001),
-    new UInt64(0x80000000, 0x80008081),
-    new UInt64(0x80000000, 0x00008009),
-    new UInt64(0x00000000, 0x0000008a),
-    new UInt64(0x00000000, 0x00000088),
-    new UInt64(0x00000000, 0x80008009),
-    new UInt64(0x00000000, 0x8000000a),
-    new UInt64(0x00000000, 0x8000808b),
-    new UInt64(0x80000000, 0x0000008b),
-    new UInt64(0x80000000, 0x00008089),
-    new UInt64(0x80000000, 0x00008003),
-    new UInt64(0x80000000, 0x00008002),
-    new UInt64(0x80000000, 0x00000080),
-    new UInt64(0x00000000, 0x0000800a),
-    new UInt64(0x80000000, 0x8000000a),
-    new UInt64(0x80000000, 0x80008081),
-    new UInt64(0x80000000, 0x00008080),
-    new UInt64(0x00000000, 0x80000001),
-    new UInt64(0x80000000, 0x80008008)
+    makeUInt64Fast(0x00000000, 0x00000001),
+    makeUInt64Fast(0x00000000, 0x00008082),
+    makeUInt64Fast(0x80000000, 0x0000808a),
+    makeUInt64Fast(0x80000000, 0x80008000),
+    makeUInt64Fast(0x00000000, 0x0000808b),
+    makeUInt64Fast(0x00000000, 0x80000001),
+    makeUInt64Fast(0x80000000, 0x80008081),
+    makeUInt64Fast(0x80000000, 0x00008009),
+    makeUInt64Fast(0x00000000, 0x0000008a),
+    makeUInt64Fast(0x00000000, 0x00000088),
+    makeUInt64Fast(0x00000000, 0x80008009),
+    makeUInt64Fast(0x00000000, 0x8000000a),
+    makeUInt64Fast(0x00000000, 0x8000808b),
+    makeUInt64Fast(0x80000000, 0x0000008b),
+    makeUInt64Fast(0x80000000, 0x00008089),
+    makeUInt64Fast(0x80000000, 0x00008003),
+    makeUInt64Fast(0x80000000, 0x00008002),
+    makeUInt64Fast(0x80000000, 0x00000080),
+    makeUInt64Fast(0x00000000, 0x0000800a),
+    makeUInt64Fast(0x80000000, 0x8000000a),
+    makeUInt64Fast(0x80000000, 0x80008081),
+    makeUInt64Fast(0x80000000, 0x00008080),
+    makeUInt64Fast(0x00000000, 0x80000001),
+    makeUInt64Fast(0x80000000, 0x80008008)
 ]
 
 /**
@@ -116,16 +120,16 @@ function pad(src, padByte) {
 
 /**
  * Change `s` in-place
- * @param {UInt64I[]} s
+ * @param {UInt64[]} s
  */
 function permute(s) {
     /**
-     * @type {UInt64I[]}
+     * @type {UInt64[]}
      */
     const c = new Array(5)
 
     /**
-     * @type {UInt64I[]}
+     * @type {UInt64[]}
      */
     const b = new Array(25)
 
@@ -190,9 +194,9 @@ export function keccakInternal(bytes, padByte) {
 
     /**
      * Initialize the state
-     * @type {UInt64I[]}
+     * @type {UInt64[]}
      */
-    const state = new Array(WIDTH / 8).fill(UInt64.zero())
+    const state = new Array(WIDTH / 8).fill(UINT64_ZERO)
 
     for (let chunkStart = 0; chunkStart < bytes.length; chunkStart += RATE) {
         // extend the chunk to become length WIDTH
@@ -203,7 +207,7 @@ export function keccakInternal(bytes, padByte) {
         // element-wise xor with 'state'
         for (let i = 0; i < WIDTH; i += 8) {
             state[i / 8] = state[i / 8].xor(
-                UInt64.fromBytes(chunk.slice(i, i + 8))
+                makeUInt64({ bytes: chunk.slice(i, i + 8) })
             )
 
             // beware: a uint32 is stored as little endian, but a pair of uint32s that form a uin64 are stored in big endian format!

@@ -1,13 +1,26 @@
-import { ShortAffine } from "../../common/index.js"
+import { ShortAffineImpl } from "../../common/index.js"
 import { F1 } from "../fields/index.js"
 
 /**
- * @extends {ShortAffine<bigint>}
+ * @template T
+ * @typedef {import("../../common/index.js").ShortAffine<T>} ShortAffine
  */
-class AffineCurve1 extends ShortAffine {
+
+/**
+ * @typedef {ShortAffine<bigint>} AffineCurve1
+ */
+
+/**
+ * @implements {AffineCurve1}
+ * @extends {ShortAffineImpl<bigint>}
+ */
+class AffineCurve1Impl extends ShortAffineImpl {
     constructor() {
         super(F1, 4n)
     }
 }
 
-export const affineCurve1 = new AffineCurve1()
+/**
+ * @type {AffineCurve1}
+ */
+export const affineCurve1 = new AffineCurve1Impl()

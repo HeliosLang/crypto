@@ -5,7 +5,7 @@
 
 /**
  * @template T
- * @typedef {import("./FieldWithOps.js").FieldWithOpsI<T>} FieldWithOpsI
+ * @typedef {import("./FieldWithOps.js").FieldWithOps<T>} FieldWithOps
  */
 
 /**
@@ -19,7 +19,7 @@
 export class CubicFieldExt {
     /**
      * @readonly
-     * @type {FieldWithOpsI<T>}
+     * @type {FieldWithOps<T>}
      */
     F
 
@@ -31,7 +31,7 @@ export class CubicFieldExt {
     V3
 
     /**
-     * @param {FieldWithOpsI<T>} F
+     * @param {FieldWithOps<T>} F
      * @param {T} V3
      */
     constructor(F, V3) {

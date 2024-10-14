@@ -1,4 +1,4 @@
-import { CurveWithOps } from "../common/index.js"
+import { CurveWithOpsImpl } from "../common/index.js"
 import { D } from "./constants.js"
 import { F } from "./field.js"
 
@@ -87,9 +87,10 @@ class AffineCurveInternal {
 }
 
 /**
+ * @extends {CurveWithOpsImpl<Point2<bigint>>}
  * @implements {Ed25519Curve<Point2<bigint>>}
  */
-export class AffineCurve extends CurveWithOps {
+export class AffineCurve extends CurveWithOpsImpl {
     constructor() {
         super(new AffineCurveInternal())
     }

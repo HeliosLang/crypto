@@ -1,12 +1,12 @@
-import { FieldWithOps, ScalarField } from "../../common/index.js"
+import { FieldWithOpsImpl, ScalarField } from "../../common/index.js"
 import { CURVE1 } from "../constants.js"
 
 const P14 = (CURVE1.P + 1n) / 4n
 
 /**
- * @extends {FieldWithOps<bigint>}
+ * @extends {FieldWithOpsImpl<bigint>}
  */
-class FieldWithSqrt extends FieldWithOps {
+class FieldWithSqrt extends FieldWithOpsImpl {
     constructor() {
         super(new ScalarField(CURVE1.P))
     }

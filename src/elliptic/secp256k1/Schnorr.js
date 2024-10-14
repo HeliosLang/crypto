@@ -26,7 +26,7 @@ import { Z } from "./field.js"
 
 /**
  * @template T
- * @typedef {import("../common/index.js").Point2<T>} Point3
+ * @typedef {import("../common/index.js").Point3<T>} Point3
  */
 
 /**
@@ -59,10 +59,32 @@ function hash(tag, bytes) {
 }
 
 /**
+ * @template T
+ * @typedef {{
+ *   curve: CurveWithFromToAffine<bigint, T>
+ *   derivePublicKey(privateKeyBytes: number[]): number[]
+ *   sign(message: number[], privateKeyBytes: number[], nonce: number[]): number[]
+ *   verify(signature: number[], message: number[], publicKeyBytes: number[]): boolean
+ * }} Schnorr
+ */
+
+/**
+ * @template T
+ * @param {{
+ *   curve: CurveWithFromToAffine<bigint, T>
+ * }} args
+ * @returns {Schnorr<T>}
+ */
+export function makeSchnorr(args) {
+    return new SchnorrImpl(args.curve)
+}
+
+/**
  * See: https://bips.xyz/340
  * @template T
+ * @implements {Schnorr<T>}
  */
-export class Schnorr {
+class SchnorrImpl {
     /**
      * @type {CurveWithFromToAffine<bigint, T>}
      */
@@ -208,4 +230,7 @@ export class Schnorr {
     }
 }
 
-export const SchnorrSecp256k1 = new Schnorr(projectedCurve)
+/**
+ * @type {Schnorr<Point3<bigint>>}
+ */
+export const SchnorrSecp256k1 = makeSchnorr({ curve: projectedCurve })

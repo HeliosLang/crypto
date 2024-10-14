@@ -16,7 +16,7 @@
  *   divide(a: T, b: T): T
  *   pow(a: T, p: bigint): T
  *   halve(a: T): T
- * }} FieldWithOpsI
+ * }} FieldWithOps
  */
 
 /**
@@ -33,9 +33,9 @@
  *   * halve(a)
  *
  * @template T
- * @implements {FieldWithOpsI<T>}
+ * @implements {FieldWithOps<T>}
  */
-export class FieldWithOps {
+export class FieldWithOpsImpl {
     /**
      * @readonly
      * @type {Field<T>}

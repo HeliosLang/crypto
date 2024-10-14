@@ -1,4 +1,4 @@
-import { Base32 } from "@helios-lang/codec-utils"
+import { makeBase32 } from "@helios-lang/codec-utils"
 
 /**
  * Bech32 base32 alphabet
@@ -6,7 +6,7 @@ import { Base32 } from "@helios-lang/codec-utils"
  */
 const BECH32_BASE32_ALPHABET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
 
-const BECH32_PAYLOAD_CODEC = new Base32({
+const BECH32_PAYLOAD_CODEC = makeBase32({
     alphabet: BECH32_BASE32_ALPHABET
 })
 

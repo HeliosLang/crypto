@@ -1,9 +1,14 @@
-import { CurveWithOps } from "./CurveWithOps.js"
-import { FieldWithOps } from "./FieldWithOps.js"
+import { CurveWithOpsImpl } from "./CurveWithOps.js"
+import { FieldWithOpsImpl } from "./FieldWithOps.js"
 
 /**
  * @template T
  * @typedef {import("./Curve.js").Curve<T>} Curve
+ */
+
+/**
+ * @template T
+ * @typedef {import("./CurveWithOps.js").CurveWithOps<T>} CurveWithOps
  */
 
 /**
@@ -13,8 +18,62 @@ import { FieldWithOps } from "./FieldWithOps.js"
 
 /**
  * @template T
+ * @typedef {import("./FieldWithOps.js").FieldWithOps<T>} FieldWithOps
+ */
+
+/**
+ * @template T
  * @typedef {import("./Point2.js").Point2<T>} Point2
  */
+
+/**
+ * @template T
+ * @typedef {CurveWithOps<Point2<T>> & {
+ *   b: T
+ *   fromAffine(point: Point2<T>): Point2<T>
+ *   toAffine(point: Point2<T>): Point2<T>
+ * }} ShortAffine
+ */
+
+/**
+ * @template T
+ * @implements {ShortAffine<T>}
+ * @extends {CurveWithOpsImpl<Point2<T>, ShortAffineInternal<T>>}
+ */
+export class ShortAffineImpl extends CurveWithOpsImpl {
+    /**
+     * @param {Field<T>} F
+     * @param {T} b
+     */
+    constructor(F, b) {
+        super(new ShortAffineInternal(F, b))
+    }
+
+    /**
+     * @type {T}
+     */
+    get b() {
+        return this.curve.b
+    }
+
+    /**
+     * This method makes it easier to swap out the affine curve for the projected curve
+     * @param {Point2<T>} point
+     * @returns {Point2<T>}
+     */
+    toAffine(point) {
+        return point
+    }
+
+    /**
+     * This method makes it easier to swap out the affine curve for the projected curve
+     * @param {Point2<T>} point
+     * @returns {Point2<T>}
+     */
+    fromAffine(point) {
+        return point
+    }
+}
 
 /**
  * Short weierstrass curve using the simple affine formulation
@@ -43,7 +102,7 @@ class ShortAffineInternal {
      * @param {T} b
      */
     constructor(F, b) {
-        this.F = new FieldWithOps(F)
+        this.F = new FieldWithOpsImpl(F)
         this.b = b
     }
 
@@ -165,43 +224,5 @@ class ShortAffineInternal {
         const ny = F.subtract(F.multiply(s, F.subtract(a.x, nx)), a.y)
 
         return { x: nx, y: ny }
-    }
-}
-/**
- * @template T
- * @extends {CurveWithOps<Point2<T>, ShortAffineInternal<T>>}
- */
-export class ShortAffine extends CurveWithOps {
-    /**
-     * @param {Field<T>} F
-     * @param {T} b
-     */
-    constructor(F, b) {
-        super(new ShortAffineInternal(F, b))
-    }
-
-    /**
-     * @type {T}
-     */
-    get b() {
-        return this.curve.b
-    }
-
-    /**
-     * This method makes it easier to swap out the affine curve for the projected curve
-     * @param {Point2<T>} point
-     * @returns {Point2<T>}
-     */
-    toAffine(point) {
-        return point
-    }
-
-    /**
-     * This method makes it easier to swap out the affine curve for the projected curve
-     * @param {Point2<T>} point
-     * @returns {Point2<T>}
-     */
-    fromAffine(point) {
-        return point
     }
 }

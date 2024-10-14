@@ -1,5 +1,5 @@
-import { CurveWithOps } from "./CurveWithOps.js"
-import { FieldWithOps } from "./FieldWithOps.js"
+import { CurveWithOpsImpl } from "./CurveWithOps.js"
+import { FieldWithOpsImpl } from "./FieldWithOps.js"
 
 /**
  * @template T
@@ -19,6 +19,11 @@ import { FieldWithOps } from "./FieldWithOps.js"
 
 /**
  * @template T
+ * @typedef {import("./FieldWithOps.js").FieldWithOps<T>} FieldWithOps
+ */
+
+/**
+ * @template T
  * @typedef {import("./Point2.js").Point2<T>} Point2
  */
 
@@ -28,15 +33,19 @@ import { FieldWithOps } from "./FieldWithOps.js"
  */
 
 /**
+ * @template {bigint | [bigint, bigint]} T
+ * @typedef {CurveWithFromToAffine<T, Point3<T>>} ShortProjected
+ */
+/**
  * Short weierstrass in extended form.
  * If we denote the affine coordinates using apostrophes we get
  *    x' = x/z and y' = y/z
  *    z*y^2 = x^3 + b*z^3 (ignoring `a` which will be zero in all relevant cases for Cardano)
- * @template T bigint or [bigint, bigint]
- * @extends {CurveWithOps<Point3<T>, ShortProjectedInternal<T>>}
- * @implements {CurveWithFromToAffine<T, Point3<T>>}
+ * @template {bigint | [bigint, bigint]} T
+ * @extends {CurveWithOpsImpl<Point3<T>, ShortProjectedInternal<T>>}
+ * @implements {ShortProjected<T>}
  */
-export class ShortProjected extends CurveWithOps {
+export class ShortProjectedImpl extends CurveWithOpsImpl {
     /**
      * @param {Field<T>} F
      * @param {T} b
@@ -103,7 +112,7 @@ class ShortProjectedInternal {
      * @param {T} b
      */
     constructor(F, b) {
-        this.F = new FieldWithOps(F)
+        this.F = new FieldWithOpsImpl(F)
         this.b = b
     }
 

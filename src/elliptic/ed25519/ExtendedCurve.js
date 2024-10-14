@@ -1,4 +1,4 @@
-import { CurveWithOps } from "../common/index.js"
+import { CurveWithOpsImpl } from "../common/index.js"
 import { D } from "./constants.js"
 import { F } from "./field.js"
 
@@ -107,9 +107,13 @@ class ExtendedCurveInternal {
 }
 
 /**
- * @implements {Ed25519Curve<Point4<bigint>>}
+ * @typedef {Ed25519Curve<Point4<bigint>>} ExtendedCurve
  */
-export class ExtendedCurve extends CurveWithOps {
+
+/**
+ * @implements {ExtendedCurve}
+ */
+export class ExtendedCurveImpl extends CurveWithOpsImpl {
     constructor() {
         super(new ExtendedCurveInternal())
     }

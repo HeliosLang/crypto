@@ -1,4 +1,4 @@
-import { ShortProjected } from "../../common/index.js"
+import { ShortProjectedImpl } from "../../common/index.js"
 import { CURVE1 } from "../constants.js"
 import { F1 } from "../fields/index.js"
 
@@ -8,9 +8,21 @@ import { F1 } from "../fields/index.js"
  */
 
 /**
- * @extends {ShortProjected<bigint>}
+ * @template {bigint | [bigint, bigint]} T
+ * @typedef {import("../../common/index.js").ShortProjected<T>} ShortProjected
  */
-class ProjectedCurve1 extends ShortProjected {
+
+/**
+ * @typedef {ShortProjected<bigint> & {
+ *   clearCofactor(point: Point3<bigint>): Point3<bigint>
+ * }} ProjectedCurve1
+ */
+
+/**
+ * @implements {ProjectedCurve1}
+ * @extends {ShortProjectedImpl<bigint>}
+ */
+class ProjectedCurve1Impl extends ShortProjectedImpl {
     constructor() {
         super(F1, 4n)
     }
@@ -27,4 +39,7 @@ class ProjectedCurve1 extends ShortProjected {
     }
 }
 
-export const projectedCurve1 = new ProjectedCurve1()
+/**
+ * @type {ProjectedCurve1}
+ */
+export const projectedCurve1 = new ProjectedCurve1Impl()
