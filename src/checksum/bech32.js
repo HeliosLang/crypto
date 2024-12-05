@@ -156,7 +156,7 @@ export function decodeBech32(addr) {
     const [hrp, payload] = splitBech32(addr)
 
     if (!verifySplitBech32(hrp, payload)) {
-        throw new Error("invalid bech32 addr")
+        throw new Error(`invalid bech32 addr ${addr}`)
     }
 
     const data = BECH32_PAYLOAD_CODEC.decode(
