@@ -1,17 +1,9 @@
-import { FieldWithOpsImpl, QuadraticFieldExt } from "../../common/index.js"
+import { FieldWithOpsImpl, makeQuadraticFieldExt } from "../../common/index.js"
 import { F2 } from "./F2.js"
 import { F6 } from "./F6.js"
 
 /**
- * @template T
- * @typedef {import("../../common/index.js").FieldWithOps<T>} FieldWithOps
- */
-
-/**
- * @typedef {[
- *   [[bigint,bigint], [bigint,bigint], [bigint, bigint]],
- *   [[bigint,bigint], [bigint,bigint], [bigint, bigint]],
- * ]} FieldElement12
+ * @import { FieldElement12, Field12WithExtendedOps } from "../../../index.js"
  */
 
 /**
@@ -66,20 +58,12 @@ const UPOWP = [
 ]
 
 /**
- * @typedef {FieldWithOps<FieldElement12> & {
- *   conjugate(a: FieldElement12): FieldElement12
- *   powp(a: FieldElement12, n: number): FieldElement12
- *   multiplyF2(a: FieldElement12, b: [bigint, bigint]): FieldElement12
- * }} Field12WithExtendedOps
- */
-
-/**
  * @implements {Field12WithExtendedOps}
  * @extends {FieldWithOpsImpl<FieldElement12>}
  */
 class Field12WithExtendedOpsImpl extends FieldWithOpsImpl {
     constructor() {
-        super(new QuadraticFieldExt(F6, [F2.ZERO, F2.ONE, F2.ZERO]))
+        super(makeQuadraticFieldExt(F6, [F2.ZERO, F2.ONE, F2.ZERO]))
     }
 
     /**

@@ -3,8 +3,7 @@ import { D } from "./constants.js"
 import { F } from "./field.js"
 
 /**
- * @template T
- * @typedef {import("../common/index.js").Point2<T>} Point2
+ * @import { Point2 } from "../../index.js"
  */
 
 /**

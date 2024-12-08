@@ -1,12 +1,17 @@
 /**
- * @template T
- * @typedef {import("./Field.js").Field<T>} Field
+ * @import { AssertExtends } from "@helios-lang/type-utils"
+ * @import { CubicFieldExt, FieldWithOps } from "../../internal.js"
  */
 
 /**
  * @template T
- * @typedef {import("./FieldWithOps.js").FieldWithOps<T>} FieldWithOps
+ * @param {FieldWithOps<T>} F
+ * @param {T} V3
+ * @returns {CubicFieldExt<T>}
  */
+export function makeCubicFieldExt(F, V3) {
+    return new CubicFieldExtImpl(F, V3)
+}
 
 /**
  * Each element consists of three coordinates, written as a + b*v + c*v^2
@@ -14,9 +19,9 @@
  * Remember, each coefficient in turn consist of two coordinates:
  *    (ax + ay*u) + (bx + by*u)*v + (cx + cy*u)*v^2
  * @template T
- * @implements {Field<[T, T, T]>}
+ * @implements {CubicFieldExt<T>}
  */
-export class CubicFieldExt {
+class CubicFieldExtImpl {
     /**
      * @readonly
      * @type {FieldWithOps<T>}

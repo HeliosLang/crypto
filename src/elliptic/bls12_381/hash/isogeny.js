@@ -11,17 +11,8 @@ import {
 import { hashToField } from "./hashToField.js"
 
 /**
- * @template T
- * @typedef {import("../../common/index.js").FieldWithOps<T>} FieldWithOps
- */
-/**
- * @template T
- * @typedef {import("../../common/index.js").Point2<T>} Point2
- */
-
-/**
- * @template T
- * @typedef {import("../../common/index.js").Point3<T>} Point3
+ * @import { Point2, Point3 } from "../../../index.js"
+ * @import { FieldWithOps } from "../../../internal.js"
  */
 
 /**

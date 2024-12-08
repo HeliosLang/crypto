@@ -5,17 +5,11 @@ import { AffineCurve } from "./AffineCurve.js"
 import { Ed25519 as ed25519Extended, makeEdDSA } from "./EdDSA.js"
 
 /**
- * @template T
- * @typedef {import("../common/index.js").Point2<T>} Point2
+ * @import { EdDSA } from "../../index.js"
  */
 
 /**
- * @template T
- * @typedef {import("./EdDSA.js").EdDSA<T>} EdDSA
- */
-
-/**
- * @type {EdDSA<Point2<bigint>>}
+ * @type {EdDSA}
  */
 const ed25519Affine = makeEdDSA({ curve: new AffineCurve() })
 

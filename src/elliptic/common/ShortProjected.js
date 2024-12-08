@@ -1,48 +1,18 @@
 import { CurveWithOpsImpl } from "./CurveWithOps.js"
-import { FieldWithOpsImpl } from "./FieldWithOps.js"
+import { makeFieldWithOps } from "./FieldWithOps.js"
 
 /**
- * @template T
- * @typedef {import("./Curve.js").Curve<T>} Curve
+ * @import { Point2, Point3 } from "../../index.js"
+ * @import { Field, FieldWithOps, ShortProjected, ShortProjectedCurve } from "../../internal.js"
  */
 
-/**
- * @template Tc
- * @template T
- * @typedef {import("./CurveWithFromToAffine.js").CurveWithFromToAffine<Tc, T>} CurveWithFromToAffine
- */
-
-/**
- * @template T
- * @typedef {import("./Field.js").Field<T>} Field
- */
-
-/**
- * @template T
- * @typedef {import("./FieldWithOps.js").FieldWithOps<T>} FieldWithOps
- */
-
-/**
- * @template T
- * @typedef {import("./Point2.js").Point2<T>} Point2
- */
-
-/**
- * @template T
- * @typedef {import("./Point3.js").Point3<T>} Point3
- */
-
-/**
- * @template {bigint | [bigint, bigint]} T
- * @typedef {CurveWithFromToAffine<T, Point3<T>>} ShortProjected
- */
 /**
  * Short weierstrass in extended form.
  * If we denote the affine coordinates using apostrophes we get
  *    x' = x/z and y' = y/z
  *    z*y^2 = x^3 + b*z^3 (ignoring `a` which will be zero in all relevant cases for Cardano)
  * @template {bigint | [bigint, bigint]} T
- * @extends {CurveWithOpsImpl<Point3<T>, ShortProjectedInternal<T>>}
+ * @extends {CurveWithOpsImpl<Point3<T>, ShortProjectedCurve<T>>}
  * @implements {ShortProjected<T>}
  */
 export class ShortProjectedImpl extends CurveWithOpsImpl {
@@ -90,7 +60,7 @@ export class ShortProjectedImpl extends CurveWithOpsImpl {
 
 /**
  * @template T
- * @implements {Curve<Point3<T>>}
+ * @implements {ShortProjectedCurve<T>}
  */
 class ShortProjectedInternal {
     /**
@@ -112,7 +82,7 @@ class ShortProjectedInternal {
      * @param {T} b
      */
     constructor(F, b) {
-        this.F = new FieldWithOpsImpl(F)
+        this.F = makeFieldWithOps(F)
         this.b = b
     }
 
@@ -181,20 +151,20 @@ class ShortProjectedInternal {
     /**
      * Taken from https://github.com/paulmillr/noble-secp256k1
      * Which in turns takes this formula from https://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html (add-2015-rcb)
-     * @param {Point3<T>} point1
-     * @param {Point3<T>} point2
+     * @param {Point3<T>} a
+     * @param {Point3<T>} b
      * @returns {Point3<T>}
      */
-    add(point1, point2) {
-        if (this.equals(point1, this.ZERO)) {
-            return point2
-        } else if (this.equals(point2, this.ZERO)) {
-            return point1
+    add(a, b) {
+        if (this.equals(a, this.ZERO)) {
+            return b
+        } else if (this.equals(b, this.ZERO)) {
+            return a
         } else {
             const F = this.F
 
-            const { x: x1, y: y1, z: z1 } = point1
-            const { x: x2, y: y2, z: z2 } = point2
+            const { x: x1, y: y1, z: z1 } = a
+            const { x: x2, y: y2, z: z2 } = b
 
             /**
              * @type {T}

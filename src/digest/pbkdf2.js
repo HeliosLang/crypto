@@ -18,9 +18,9 @@ function xor(a, b) {
 /**
  * Password-Based Key Derivation Function 2.
  * @example
- * bytesToHex(Crypto.pbkdf2(Crypto.hmacSha2_256, textToBytes("password"), textToBytes("salt"), 1, 20)) == "120fb6cffcf8b32c43e7225256c4f837a86548c9"
+ * bytesToHex(pbkdf2(hmacSha2_256, textToBytes("password"), textToBytes("salt"), 1, 20)) == "120fb6cffcf8b32c43e7225256c4f837a86548c9"
  * @example
- * bytesToHex(Crypto.pbkdf2(Crypto.hmacSha2_512, textToBytes("password"), textToBytes("salt"), 2, 20)) == "e1d9c16aa681708a45f5c7c4e215ceb66e011a2e"
+ * bytesToHex(pbkdf2(hmacSha2_512, textToBytes("password"), textToBytes("salt"), 2, 20)) == "e1d9c16aa681708a45f5c7c4e215ceb66e011a2e"
  * @param {(key: number[], msg: number[]) => number[]} prf
  * @param {number[]} password
  * @param {number[]} salt

@@ -13,7 +13,3 @@ export {
 export { F12 } from "./fields/index.js"
 export { hashToG1, hashToG2 } from "./hash/index.js"
 export { finalExponentiate, finalVerify, millerLoop } from "./pairing.js"
-
-/**
- * @typedef {import("./fields/index.js").FieldElement12} FieldElement12
- */

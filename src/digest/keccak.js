@@ -1,9 +1,3 @@
-/**
- * Keccak is a family of hashing functions, of which Sha3 is the most well-known
- *
- * Keccak_256 refers to the older implementation, using 0x01 as a padByte (Sha3 uses 0x06 as a padyte)
- */
-
 import {
     UINT64_ZERO,
     makeUInt64,
@@ -11,7 +5,13 @@ import {
 } from "@helios-lang/codec-utils"
 
 /**
- * @typedef {import("@helios-lang/codec-utils").UInt64} UInt64
+ * @import { UInt64 } from "@helios-lang/codec-utils"
+ */
+
+/**
+ * Keccak is a family of hashing functions, of which Sha3 is the most well-known
+ *
+ * Keccak_256 refers to the older implementation, using 0x01 as a padByte (Sha3 uses 0x06 as a padyte)
  */
 
 /**

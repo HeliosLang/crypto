@@ -13,25 +13,8 @@ import { G, N } from "./constants.js"
 import { Z } from "./field.js"
 
 /**
- * @template Tc
- * @template T
- * @typedef {import("../common/index.js").CurveWithFromToAffine<Tc, T>} CurveWithFromToAffine
- */
-
-/**
- * @template T
- * @typedef {import("../common/index.js").Point3<T>} Point3
- */
-
-/**
- * The ECDSA algorithm is explained very well here: https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages
- * @template T
- * @typedef {{
- *   curve: CurveWithFromToAffine<bigint, T>
- *   derivePublicKey(privateKeyBytes: number[]): number[]
- *   sign(messageHash: number[], privateKeyBytes: number[]): number[]
- *   verify(signature: number[], messageHash: number[], publicKeyByes: number[]): boolean
- * }} ECDSA
+ * @import { ECDSA } from "../../index.js"
+ * @import { CurveWithFromToAffine } from "../../internal.js"
  */
 
 /**
@@ -39,7 +22,7 @@ import { Z } from "./field.js"
  * @param {{
  *   curve: CurveWithFromToAffine<bigint, T>
  * }} args
- * @returns {ECDSA<T>}
+ * @returns {ECDSA}
  */
 export function makeECDSA(args) {
     return new ECDSAImpl(args.curve)
@@ -47,10 +30,11 @@ export function makeECDSA(args) {
 
 /**
  * @template T
- * @implements {ECDSA<T>}
+ * @implements {ECDSA}
  */
 class ECDSAImpl {
     /**
+     * @private
      * @readonly
      * @type {CurveWithFromToAffine<bigint, T>}
      */
@@ -181,6 +165,6 @@ class ECDSAImpl {
 }
 
 /**
- * @type {ECDSA<Point3<bigint>>}
+ * @type {ECDSA}
  */
 export const ECDSASecp256k1 = new ECDSAImpl(projectedCurve)

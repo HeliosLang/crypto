@@ -1,6 +1,6 @@
 import { deepEqual, strictEqual, throws } from "node:assert"
 import { describe, it } from "node:test"
-import { decodeBase32, encodeUtf8, hexToBytes } from "@helios-lang/codec-utils"
+import { encodeUtf8, hexToBytes } from "@helios-lang/codec-utils"
 import { decodeBech32, encodeBech32, isValidBech32 } from "./bech32.js"
 
 describe(encodeBech32.name, () => {
@@ -28,7 +28,7 @@ describe(encodeBech32.name, () => {
     })
 })
 
-describe(decodeBase32.name, () => {
+describe(decodeBech32.name, () => {
     it("fails for empty string", () => {
         throws(() => decodeBech32(""))
     })
@@ -46,6 +46,20 @@ describe(decodeBase32.name, () => {
                 "addr_test",
                 hexToBytes(
                     "70a9508f015cfbcffc3d88ac4c1c934b5b82d2bb281d464672f6c49539"
+                )
+            ]
+        )
+    })
+
+    it("for script1agrmwv7exgffcdu27cn5xmnuhsh0p0ukuqpkhdgm800xksw7e2w", () => {
+        deepEqual(
+            decodeBech32(
+                "script1agrmwv7exgffcdu27cn5xmnuhsh0p0ukuqpkhdgm800xksw7e2w"
+            ),
+            [
+                "script",
+                hexToBytes(
+                    "ea07b733d932129c378af627436e7cbc2ef0bf96e0036bb51b3bde6b"
                 )
             ]
         )

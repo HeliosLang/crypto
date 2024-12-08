@@ -3,18 +3,8 @@ import { affineCurve1 as G1, affineCurve2 as G2 } from "./curves/index.js"
 import { F2, F12 } from "./fields/index.js"
 
 /**
- * @template T
- * @typedef {import("../common/index.js").Point2<T>} Point2
- */
-
-/**
- * @template T
- * @typedef {import("../common/index.js").Point3<T>} Point3
- */
-
-/**
- * @typedef {import("./fields/index.js").FieldElement6} FieldElement6
- * @typedef {import("./fields/index.js").FieldElement12} FieldElement12
+ * @import { FieldElement12, Point2, Point3 } from "../../index.js"
+ * @import { FieldElement6 } from "../../internal.js"
  */
 
 /**

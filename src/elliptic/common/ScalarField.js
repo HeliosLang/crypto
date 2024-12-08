@@ -1,14 +1,21 @@
 import { mod } from "./mod.js"
 
 /**
- * @template T
- * @typedef {import("./Field.js").Field<T>} Field
+ * @import { ScalarField } from "../../internal.js"
  */
 
 /**
- * @implements {Field<bigint>}
+ * @param {bigint} modulo
+ * @returns {ScalarField}
  */
-export class ScalarField {
+export function makeScalarField(modulo) {
+    return new ScalarFieldImpl(modulo)
+}
+
+/**
+ * @implements {ScalarField}
+ */
+class ScalarFieldImpl {
     /**
      * Every operation is modulo this number
      * @readonly

@@ -1,44 +1,15 @@
 import { CurveWithOpsImpl } from "./CurveWithOps.js"
-import { FieldWithOpsImpl } from "./FieldWithOps.js"
+import { makeFieldWithOps } from "./FieldWithOps.js"
 
 /**
- * @template T
- * @typedef {import("./Curve.js").Curve<T>} Curve
- */
-
-/**
- * @template T
- * @typedef {import("./CurveWithOps.js").CurveWithOps<T>} CurveWithOps
- */
-
-/**
- * @template T
- * @typedef {import("./Field.js").Field<T>} Field
- */
-
-/**
- * @template T
- * @typedef {import("./FieldWithOps.js").FieldWithOps<T>} FieldWithOps
- */
-
-/**
- * @template T
- * @typedef {import("./Point2.js").Point2<T>} Point2
- */
-
-/**
- * @template T
- * @typedef {CurveWithOps<Point2<T>> & {
- *   b: T
- *   fromAffine(point: Point2<T>): Point2<T>
- *   toAffine(point: Point2<T>): Point2<T>
- * }} ShortAffine
+ * @import { Point2 } from "../../index.js"
+ * @import { Field, FieldWithOps, ShortAffine, ShortAffineCurve } from "../../internal.js"
  */
 
 /**
  * @template T
  * @implements {ShortAffine<T>}
- * @extends {CurveWithOpsImpl<Point2<T>, ShortAffineInternal<T>>}
+ * @extends {CurveWithOpsImpl<Point2<T>, ShortAffineCurve<T>>}
  */
 export class ShortAffineImpl extends CurveWithOpsImpl {
     /**
@@ -81,7 +52,7 @@ export class ShortAffineImpl extends CurveWithOpsImpl {
  * Currently all the relevant elliptic curves for Cardano use a==0, so this is also simplified here
  *   Y^2 = X^3 + b
  * @template T bigint, [bigint, bigint] etc.
- * @implements {Curve<Point2<T>>}
+ * @implements {ShortAffineCurve<T>}
  */
 class ShortAffineInternal {
     /**
@@ -102,7 +73,7 @@ class ShortAffineInternal {
      * @param {T} b
      */
     constructor(F, b) {
-        this.F = new FieldWithOpsImpl(F)
+        this.F = makeFieldWithOps(F)
         this.b = b
     }
 

@@ -1,9 +1,12 @@
-import { FieldWithOpsImpl, ScalarField } from "../common/index.js"
+import {
+    FieldWithOpsImpl,
+    makeFieldWithOps,
+    makeScalarField
+} from "../common/index.js"
 import { N, P } from "./constants.js"
 
 /**
- * @template T
- * @typedef {import("../common/index.js").FieldWithOps<T>} FieldWithOps
+ * @import { FieldWithOps } from "../../internal.js"
  */
 
 // (P + 1n)/4n
@@ -15,7 +18,7 @@ const P14 =
  */
 class WithSqrt extends FieldWithOpsImpl {
     constructor() {
-        super(new ScalarField(P))
+        super(makeScalarField(P))
     }
 
     /**
@@ -40,4 +43,4 @@ export const F = new WithSqrt()
 /**
  * @type {FieldWithOps<bigint>}
  */
-export const Z = new FieldWithOpsImpl(new ScalarField(N))
+export const Z = makeFieldWithOps(makeScalarField(N))

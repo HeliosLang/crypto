@@ -3,21 +3,8 @@ import { CURVE1 } from "../constants.js"
 import { F2, F12, F6 } from "../fields/index.js"
 
 /**
- * @template T
- * @typedef {import("../../common/index.js").Point3<T>} Point3
- */
-
-/**
- * @typedef {import("../fields/index.js").FieldElement6} FieldElement6
- */
-
-/**
- * @typedef {import("../fields/index.js").FieldElement12} FieldElement12
- */
-
-/**
- * @template {bigint | [bigint, bigint]} T
- * @typedef {import("../../common/index.js").ShortProjected<T>} ShortProjected
+ * @import { FieldElement12, Point3, ProjectedCurve2 } from "../../../index.js"
+ * @import { FieldElement6, ShortProjected } from "../../../internal.js"
  */
 
 /**
@@ -43,15 +30,6 @@ const wcu_inv = F12.invert(wcu)
 // 1 / F2(2)^((p-1)/3) in GF(p²)
 const PSI2_C1 =
     0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaacn
-
-/**
- * @typedef {ShortProjected<[bigint, bigint]> & {
- *   scalex(point: Point3<[bigint, bigint]>): Point3<[bigint, bigint]>
- *   psi(point: Point3<[bigint, bigint]>): Point3<[bigint, bigint]>
- *   psi2(point: Point3<[bigint, bigint]>): Point3<[bigint, bigint]>
- *   clearCofactor(point: Point3<[bigint, bigint]>): Point3<[bigint, bigint]>
- * }} ProjectedCurve2
- */
 
 /**
  * @implements {ProjectedCurve2}

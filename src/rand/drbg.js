@@ -8,7 +8,7 @@ const MAX_ITERS = 1000
  * See https://datatracker.ietf.org/doc/html/rfc6979#section-3.2
  * @template T
  * @param {number[]} seed privateKey concatenated with hash of message according to rfc6979
- * @param {(bytes: number[]) => (T | undefined)} pred keep generating new bytes until pred returns something non-undefined (signifying a certian condition has been satisfied)
+ * @param {(bytes: number[]) => (T | undefined)} pred keep generating new bytes until pred returns something non-undefined (signifying a certain condition has been satisfied)
  * @returns {T}
  */
 export function hmacDrbg(seed, pred) {

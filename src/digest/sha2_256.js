@@ -99,7 +99,7 @@ function sigma1(x) {
  * Calculates sha2-256 (32bytes) hash of a list of bytes.
  * Result is also a list of bytes.
  * @example
- * Crypto.sha2_256(textToBytes("Hello, World!")) == [223, 253, 96, 33, 187, 43, 213, 176, 175, 103, 98, 144, 128, 158, 195, 165, 49, 145, 221, 129, 199, 247, 10, 75, 40, 104, 138, 54, 33, 130, 152, 111]
+ * sha2_256(textToBytes("Hello, World!")) == [223, 253, 96, 33, 187, 43, 213, 176, 175, 103, 98, 144, 128, 158, 195, 165, 49, 145, 221, 129, 199, 247, 10, 75, 40, 104, 138, 54, 33, 130, 152, 111]
  * @param {number[]} bytes List of uint8 numbers
  * @returns {number[]} List of uint8 numbers.
  */

@@ -1,6 +1,5 @@
 /**
- * Function that generates a random number between 0 and 1
- * @typedef {() => number} NumberGenerator
+ * @import { NumberGenerator } from "../index.js"
  */
 
 /**

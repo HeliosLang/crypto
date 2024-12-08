@@ -1,16 +1,16 @@
 /**
- * @template T
- * @typedef {import("./Curve.js").Curve<T>} Curve
+ * @import { Curve, CurveWithOps } from "../../internal.js"
  */
 
 /**
  * @template T
- * @typedef {Curve<T> & {
- *   isZero(point: T): boolean
- *   subtract(a: T, b: T): T
- *   scale(point: T, s: bigint): T
- * }} CurveWithOps
+ * @template {Curve<T>} [C=Curve<T>]
+ * @param {C} curve
+ * @returns {CurveWithOps<T>}
  */
+export function makeCurveWithOps(curve) {
+    return new CurveWithOpsImpl(curve)
+}
 
 /**
  * @template T

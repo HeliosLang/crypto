@@ -1,7 +1,7 @@
 import { makeUInt64, makeUInt64Fast } from "@helios-lang/codec-utils"
 
 /**
- * @typedef {import("@helios-lang/codec-utils").UInt64} UInt64
+ * @import { UInt64 } from "@helios-lang/codec-utils"
  */
 
 /**
@@ -126,9 +126,9 @@ function compress(h, chunk, t, last) {
  * Calculates blake2b hash of a list of uint8 numbers (variable digest size).
  * Result is also a list of uint8 numbers.
  * @example
- * bytesToHex(Crypto.blake2b([0, 1])) == "01cf79da4945c370c68b265ef70641aaa65eaa8f5953e3900d97724c2c5aa095"
+ * bytesToHex(blake2b([0, 1])) == "01cf79da4945c370c68b265ef70641aaa65eaa8f5953e3900d97724c2c5aa095"
  * @example
- * bytesToHex(Crypto.blake2b(textToBytes("abc"), 64)) == "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923"
+ * bytesToHex(blake2b(textToBytes("abc"), 64)) == "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923"
  * @param {number[]} bytes
  * @param {number} digestSize Defaults to 32. Can't be greater than 64.
  * @returns {number[]} List of uint8 numbers.

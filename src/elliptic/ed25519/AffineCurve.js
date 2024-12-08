@@ -3,18 +3,8 @@ import { D } from "./constants.js"
 import { F } from "./field.js"
 
 /**
- * @template T
- * @typedef {import("../common/index.js").Curve<T>} Curve
- */
-
-/**
- * @template T
- * @typedef {import("../common/index.js").Point2<T>} Point2
- */
-
-/**
- * @template T
- * @typedef {import("./Ed25519Curve.js").Ed25519Curve<T>} Ed25519Curve
+ * @import { Point2 } from "../../index.js"
+ * @import { Curve, Ed25519Curve } from "../../internal.js"
  */
 
 /**

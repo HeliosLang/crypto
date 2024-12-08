@@ -11,94 +11,16 @@ import { G } from "./constants.js"
 import { Z } from "./field.js"
 
 /**
- * @template T
- * @typedef {import("../common/index.js").Point4<T>} Point4
- */
-
-/**
- * @template T
- * @typedef {import("./Ed25519Curve.js").Ed25519Curve<T>} Ed25519Curve
+ * @import { EdDSA } from "../../index.js"
+ * @import { Ed25519Curve } from "../../internal.js"
  */
 
 const hash = sha2_512
 
 /**
- * Edwards Digital Signing Algorithm
- *
- * Symbols based on the book "Elliptic Curves in Cryptography" by I.F. Blake, G. Seroussi and N.P. Smart
- * See page 4 for an overview of the DSA algorithm.
- * This book along with the first few sections of "Cryptography: An Introduction" by N.P. Smart are
- *   recommended reads in order to understand better the concepts of "scalars" and "CurvePoint" and
- *   their arithmatic over finite fields.
- *
- * Notation:
- *   privateKey: 64 bytes, first 32 bytes form the scalar integer `x`, the latter bytes are used for private nonce generation
- *   publicKey: 32 bytes
- *   x: bigint scalar representation of privateKey
- *   g: generator BASE point
- *   h: CurvePoint representation of publicKey
- *   m: (hashed) message, kept as bytes
- *   k: a practically random number, created by applying a one-way function to the message and part of the private key
- *   a: first part of signature
- *   b: second part of signature
- *   `*`: group multiplication of a CurvePoint by a scalar integer, or multiplication of 2 scalars (depending on context)
- *   `+`: CurvePoint addition or scalar addition depending on context
- *   `.`: byte concatenation
- *   `[n:N]`: slice bytes
- *   `f(a,h,m)`: a one-way function for publicy known information
- *   `mod()`: take modulo of a scalar wrt. the order of the Curve
- *   `hash()`: Sha512 hash function
- *   `encodeScalar`: turn a scalar integer into bytes
- *   `decodeScalar`: turn bytes into a scalar integer
- *   `encodePoint`: turn a CurvePoint into bytes
- *   `decodePoint`: turn bytes into a CurvePoint
- *
- * The algorithm below is approached from an additive perspective.
- *
- * 1. Generate 64 random private key bytes
- *      privateKey = random(64)
- * 2. Generate the associated scalar `x`:
- *      x = decodeScalar(privateKey[0:32])
- * 3. Generate public key CurvePoint:
- *      h = g*x
- * 4. Encode public key:
- *      publicKey = encodePoint(h)
- * 5. Create first part of a signature:
- *      k = decodeScalar(hash(privateKey[32:64] . m))
- *      a = g*k
- *      signature[0:32] = encodePoint(a)
- * 6. Create second part of a signature:
- *      f(a,h,m) = decodeScalar(hash(signature[0:32] . publicKey . m))
- *      b = mod(k + f(a,h,m)*x)
- *      signature[32:64] = encodeScalar(b)
- * 7. Verify a signature:
- *      a = decodePoint(signature[0:32])
- *      b = decodeScalar(signature[32:64])
- *      h = decodePoint(publicKey)
- *      f(a,h,m) = decodeScalar(hash(signature[0:32] . publicKey . m))
- *      g*b === a + h*f(a,h,m)
- *
- * We can show that this works by substituting the private calculations done upon signing (the arithmatic takes care of the mod() operator):
- *      g*(k + f(a,h,m)*x) === g*k + h*f(a,h,m)
- *      g*k + g*x*f(a,h,m) === g*k + h*f(a,h,m)
- *
- * We know that `g*x == h`, QED.
- *
- * The arithmatic details are handled by the CurvePoint class
- *
- * @template T
- * @typedef {{
- *   curve: Ed25519Curve<T>
- *   derivePublicKey(privateKeyBytes: number[], hashPrivateKey?: boolean): number[]
- *   sign(message: number[], privateKeyBytes: number[], hashPrivateKey?: boolean): number[]
- *   verify(signature: number[], message: number[], publicKey: number[]): boolean
- * }} EdDSA
- */
-
-/**
  * @template T
  * @param {{curve: Ed25519Curve<T>}} args
- * @returns {EdDSA<T>}
+ * @returns {EdDSA}
  */
 export function makeEdDSA(args) {
     return new EdDSAImpl(args.curve)
@@ -106,10 +28,11 @@ export function makeEdDSA(args) {
 
 /**
  * @template T
- * @implements {EdDSA<T>}
+ * @implements {EdDSA}
  */
 class EdDSAImpl {
     /**
+     * @private
      * @type {Ed25519Curve<T>}
      */
     curve
@@ -253,6 +176,6 @@ class EdDSAImpl {
 }
 
 /**
- * @type {EdDSA<Point4<bigint>>}
+ * @type {EdDSA}
  */
 export const Ed25519 = makeEdDSA({ curve: new ExtendedCurveImpl() })

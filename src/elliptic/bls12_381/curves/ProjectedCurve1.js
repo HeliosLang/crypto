@@ -3,19 +3,7 @@ import { CURVE1 } from "../constants.js"
 import { F1 } from "../fields/index.js"
 
 /**
- * @template T
- * @typedef {import("../../common/index.js").Point3<T>} Point3
- */
-
-/**
- * @template {bigint | [bigint, bigint]} T
- * @typedef {import("../../common/index.js").ShortProjected<T>} ShortProjected
- */
-
-/**
- * @typedef {ShortProjected<bigint> & {
- *   clearCofactor(point: Point3<bigint>): Point3<bigint>
- * }} ProjectedCurve1
+ * @import { Point3, ProjectedCurve1 } from "../../../index.js"
  */
 
 /**

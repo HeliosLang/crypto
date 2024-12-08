@@ -4,8 +4,7 @@ import { F1, F2 } from "./fields/index.js"
 import { CURVE1 } from "./constants.js"
 
 /**
- * @template T
- * @typedef {import("../common/index.js").Point2<T>} Point2
+ * @import { Point2 } from "../../index.js"
  */
 
 /**

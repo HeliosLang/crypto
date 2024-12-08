@@ -2,12 +2,7 @@ import { ShortAffineImpl } from "../../common/index.js"
 import { F1 } from "../fields/index.js"
 
 /**
- * @template T
- * @typedef {import("../../common/index.js").ShortAffine<T>} ShortAffine
- */
-
-/**
- * @typedef {ShortAffine<bigint>} AffineCurve1
+ * @import { AffineCurve1 } from "../../../index.js"
  */
 
 /**

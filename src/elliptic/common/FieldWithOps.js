@@ -1,23 +1,15 @@
 /**
- * @template T
- * @typedef {import("./Field.js").Field<T>} Field
+ * @import { Field, FieldWithOps } from "../../internal.js"
  */
 
 /**
  * @template T
- * @typedef {Field<T> & {
- *   isZero(a: T): boolean
- *   isOne(a: T): boolean
- *   mod(a: T): T
- *   subtract(a: T, b: T): T
- *   negate(a: T): T
- *   square(a: T): T
- *   cube(a: T): T
- *   divide(a: T, b: T): T
- *   pow(a: T, p: bigint): T
- *   halve(a: T): T
- * }} FieldWithOps
+ * @param {Field<T>} F
+ * @returns {FieldWithOps<T>}
  */
+export function makeFieldWithOps(F) {
+    return new FieldWithOpsImpl(F)
+}
 
 /**
  * Defines additional operations on a field (which use the basic operations as building blocks)

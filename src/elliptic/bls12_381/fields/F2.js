@@ -1,9 +1,9 @@
-import { FieldWithOpsImpl, QuadraticFieldExt } from "../../common/index.js"
+import { FieldWithOpsImpl, makeQuadraticFieldExt } from "../../common/index.js"
 import { CURVE1 } from "../constants.js"
 import { F1 } from "./F1.js"
 
 /**
- * @typedef {[bigint, bigint]} FieldElement
+ * @import { FieldElement2 } from "../../../internal.js"
  */
 
 const UPOWP = [
@@ -54,7 +54,7 @@ const ETAs = [
  */
 class FieldWithExtraOps extends FieldWithOpsImpl {
     constructor() {
-        super(new QuadraticFieldExt(F1, -1n))
+        super(makeQuadraticFieldExt(F1, -1n))
     }
 
     /**
@@ -66,9 +66,9 @@ class FieldWithExtraOps extends FieldWithOpsImpl {
      *    bx^2 = (ax + sqrt(ax^2 + ay^2))/2
      *    by^2 = bx^2 - ax
      * Cost: 3 sqrts and 1 div on F1
-     * @param {FieldElement} a
+     * @param {FieldElement2} a
      * @param {boolean | undefined} largest
-     * @returns {FieldElement}
+     * @returns {FieldElement2}
      */
     sqrt([ax, ay], largest = undefined) {
         const ax2 = F1.square(ax)

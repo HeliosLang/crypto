@@ -1,19 +1,23 @@
 /**
- * @template T
- * @typedef {import("./Field.js").Field<T>} Field
+ * @import { FieldWithOps, QuadraticFieldExt } from "../../internal.js"
  */
 
 /**
  * @template T
- * @typedef {import("./FieldWithOps.js").FieldWithOps<T>} FieldWithOps
+ * @param {FieldWithOps<T>} F
+ * @param {T} U2
+ * @returns {QuadraticFieldExt<T>}
  */
+export function makeQuadraticFieldExt(F, U2) {
+    return new QuadraticFieldExtImpl(F, U2)
+}
 
 /**
  * Extends the scalar field analogously to how complex numbers extend real numbers
  * @template T
- * @implements {Field<[T, T]>}
+ * @implements {QuadraticFieldExt<T>}
  */
-export class QuadraticFieldExt {
+class QuadraticFieldExtImpl {
     /**
      * Field used for each component
      * @readonly

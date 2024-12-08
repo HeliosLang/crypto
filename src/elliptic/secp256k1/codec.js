@@ -4,8 +4,7 @@ import { N, P } from "./constants.js"
 import { F } from "./field.js"
 
 /**
- * @template T
- * @typedef {import("../common/index.js").Point2<T>} Point2
+ * @import { Point2 } from "../../index.js"
  */
 
 // sadly each curve has other encoding/decoding requirements for scalars and for curve points, so these functions can't be reused across curves
