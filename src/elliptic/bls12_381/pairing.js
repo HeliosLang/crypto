@@ -100,7 +100,7 @@ function precompute(bx, by) {
     return res
 }
 
-const CURVEx = CURVE1.X
+const CURVEx = /* @__PURE__ */ (() => CURVE1.X)()
 
 /**
  * @param {bigint} x

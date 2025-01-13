@@ -8,4 +8,5 @@ import { F } from "./field.js"
 /**
  * @type {ShortProjected<bigint>}
  */
-export const projectedCurve = new ShortProjectedImpl(F, 7n)
+export const projectedCurve = (() =>
+    /* @__PURE__ */ new ShortProjectedImpl(F, 7n))()

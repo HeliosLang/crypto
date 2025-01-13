@@ -14,14 +14,14 @@ const WIDTH = 128
  * Initialization vector
  */
 const IV = [
-    makeUInt64Fast(0x6a09e667, 0xf3bcc908),
-    makeUInt64Fast(0xbb67ae85, 0x84caa73b),
-    makeUInt64Fast(0x3c6ef372, 0xfe94f82b),
-    makeUInt64Fast(0xa54ff53a, 0x5f1d36f1),
-    makeUInt64Fast(0x510e527f, 0xade682d1),
-    makeUInt64Fast(0x9b05688c, 0x2b3e6c1f),
-    makeUInt64Fast(0x1f83d9ab, 0xfb41bd6b),
-    makeUInt64Fast(0x5be0cd19, 0x137e2179)
+    /* @__PURE__ */ makeUInt64Fast(0x6a09e667, 0xf3bcc908),
+    /* @__PURE__ */ makeUInt64Fast(0xbb67ae85, 0x84caa73b),
+    /* @__PURE__ */ makeUInt64Fast(0x3c6ef372, 0xfe94f82b),
+    /* @__PURE__ */ makeUInt64Fast(0xa54ff53a, 0x5f1d36f1),
+    /* @__PURE__ */ makeUInt64Fast(0x510e527f, 0xade682d1),
+    /* @__PURE__ */ makeUInt64Fast(0x9b05688c, 0x2b3e6c1f),
+    /* @__PURE__ */ makeUInt64Fast(0x1f83d9ab, 0xfb41bd6b),
+    /* @__PURE__ */ makeUInt64Fast(0x5be0cd19, 0x137e2179)
 ]
 
 const SIGMA = [

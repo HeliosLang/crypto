@@ -94,7 +94,7 @@ function expandMessage(msg, dst, n) {
     return expandMessageXmd(msg, dst, n)
 }
 
-const L = Math.ceil((381 + 128) / 8)
+const L = /* @__PURE__ */ (() => Math.ceil((381 + 128) / 8))()
 
 /**
  * @param {number[]} msg

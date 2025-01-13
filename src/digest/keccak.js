@@ -30,7 +30,7 @@ const RATE = 136
  * Capacity
  * @type {number}
  */
-const CAP = WIDTH - RATE
+const CAP = /* @__PURE__ */ (() => WIDTH - RATE)()
 
 /**
  * 24 numbers used in the sha3 permute function
@@ -55,30 +55,30 @@ const SHIFTS = [
  * @type {UInt64[]}
  */
 const RC = [
-    makeUInt64Fast(0x00000000, 0x00000001),
-    makeUInt64Fast(0x00000000, 0x00008082),
-    makeUInt64Fast(0x80000000, 0x0000808a),
-    makeUInt64Fast(0x80000000, 0x80008000),
-    makeUInt64Fast(0x00000000, 0x0000808b),
-    makeUInt64Fast(0x00000000, 0x80000001),
-    makeUInt64Fast(0x80000000, 0x80008081),
-    makeUInt64Fast(0x80000000, 0x00008009),
-    makeUInt64Fast(0x00000000, 0x0000008a),
-    makeUInt64Fast(0x00000000, 0x00000088),
-    makeUInt64Fast(0x00000000, 0x80008009),
-    makeUInt64Fast(0x00000000, 0x8000000a),
-    makeUInt64Fast(0x00000000, 0x8000808b),
-    makeUInt64Fast(0x80000000, 0x0000008b),
-    makeUInt64Fast(0x80000000, 0x00008089),
-    makeUInt64Fast(0x80000000, 0x00008003),
-    makeUInt64Fast(0x80000000, 0x00008002),
-    makeUInt64Fast(0x80000000, 0x00000080),
-    makeUInt64Fast(0x00000000, 0x0000800a),
-    makeUInt64Fast(0x80000000, 0x8000000a),
-    makeUInt64Fast(0x80000000, 0x80008081),
-    makeUInt64Fast(0x80000000, 0x00008080),
-    makeUInt64Fast(0x00000000, 0x80000001),
-    makeUInt64Fast(0x80000000, 0x80008008)
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x00000001),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x00008082),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x0000808a),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x80008000),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x0000808b),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x80000001),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x80008081),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x00008009),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x0000008a),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x00000088),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x80008009),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x8000000a),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x8000808b),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x0000008b),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x00008089),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x00008003),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x00008002),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x00000080),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x0000800a),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x8000000a),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x80008081),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x00008080),
+    /* @__PURE__ */ makeUInt64Fast(0x00000000, 0x80000001),
+    /* @__PURE__ */ makeUInt64Fast(0x80000000, 0x80008008)
 ]
 
 /**

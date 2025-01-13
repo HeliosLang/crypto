@@ -178,4 +178,6 @@ class EdDSAImpl {
 /**
  * @type {EdDSA}
  */
-export const Ed25519 = makeEdDSA({ curve: new ExtendedCurveImpl() })
+export const Ed25519 = /* @__PURE__ */ makeEdDSA({
+    curve: /* @__PURE__ */ new ExtendedCurveImpl()
+})

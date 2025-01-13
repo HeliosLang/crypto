@@ -11,7 +11,7 @@ const UPOWP = [
     4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559786n // P - 1
 ]
 
-const P_MINUS_9_DIV_16 = (CURVE1.P ** 2n - 9n) / 16n
+const P_MINUS_9_DIV_16 = /* @__PURE__ */ (() => (CURVE1.P ** 2n - 9n) / 16n)()
 
 // For Fp2 roots of unity.
 const rv1 =
@@ -28,7 +28,7 @@ const ev4 =
 /**
  * @type {[bigint, bigint][]}
  */
-const ROOTS_OF_UNITY = [
+const ROOTS_OF_UNITY = /* @__PURE__ */ (() => [
     [1n, 0n],
     [rv1, -rv1],
     [0n, 1n],
@@ -37,17 +37,17 @@ const ROOTS_OF_UNITY = [
     [-rv1, rv1],
     [0n, -1n],
     [-rv1, -rv1]
-]
+])()
 
 /**
  * @type {[bigint, bigint][]}
  */
-const ETAs = [
+const ETAs = /* @__PURE__ */ (() => [
     [ev1, ev2],
     [-ev2, ev1],
     [ev3, ev4],
     [-ev4, ev3]
-]
+])()
 
 /**
  * @extends {FieldWithOpsImpl<[bigint, bigint]>}
@@ -223,4 +223,4 @@ class FieldWithExtraOps extends FieldWithOpsImpl {
     }
 }
 
-export const F2 = new FieldWithExtraOps()
+export const F2 = (() => /* @__PURE__ */ new FieldWithExtraOps())()

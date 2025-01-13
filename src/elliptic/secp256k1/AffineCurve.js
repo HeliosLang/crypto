@@ -8,4 +8,4 @@ import { F } from "./field.js"
 /**
  * @type {ShortAffine<bigint>}
  */
-export const affineCurve = new ShortAffineImpl(F, 7n)
+export const affineCurve = (() => /* @__PURE__ */ new ShortAffineImpl(F, 7n))()

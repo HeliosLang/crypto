@@ -167,4 +167,5 @@ class ECDSAImpl {
 /**
  * @type {ECDSA}
  */
-export const ECDSASecp256k1 = new ECDSAImpl(projectedCurve)
+export const ECDSASecp256k1 = (() =>
+    /* @__PURE__ */ new ECDSAImpl(projectedCurve))()

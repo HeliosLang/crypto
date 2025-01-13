@@ -16,8 +16,8 @@ export const N =
 //  The formula for the twisted Edwards curve is:
 //    -x^2 + y^2 = 1 - d*x^2*y^2
 // Note: the negative number is already included in this parameter
-export const D =
-    -4513249062541557337682894930092624173785641285191125241628941591882900924598840740n // -121665n/121666n == -121665n * invert(121666n)
+export const D = /* @__PURE__ */ (() =>
+    -4513249062541557337682894930092624173785641285191125241628941591882900924598840740n)() // -121665n/121666n == -121665n * invert(121666n)
 
 // Generator point
 export const G = {

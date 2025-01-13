@@ -1,5 +1,4 @@
 /**
- * @import { AssertExtends } from "@helios-lang/type-utils"
  * @import { CubicFieldExt, FieldWithOps } from "../../internal.js"
  */
 

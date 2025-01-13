@@ -98,4 +98,4 @@ class FieldWithPowp extends FieldWithOpsImpl {
  * The following rule is used to simplify overflowing degrees:
  *    v^3 = u + 1
  */
-export const F6 = new FieldWithPowp()
+export const F6 = (() => /* @__PURE__ */ new FieldWithPowp())()

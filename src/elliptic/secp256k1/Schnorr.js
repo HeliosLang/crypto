@@ -212,4 +212,6 @@ class SchnorrImpl {
 /**
  * @type {Schnorr}
  */
-export const SchnorrSecp256k1 = makeSchnorr({ curve: projectedCurve })
+export const SchnorrSecp256k1 = /* @__PURE__ */ makeSchnorr({
+    curve: projectedCurve
+})

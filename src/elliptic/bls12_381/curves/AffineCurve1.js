@@ -18,4 +18,4 @@ class AffineCurve1Impl extends ShortAffineImpl {
 /**
  * @type {AffineCurve1}
  */
-export const affineCurve1 = new AffineCurve1Impl()
+export const affineCurve1 = (() => /* @__PURE__ */ new AffineCurve1Impl())()

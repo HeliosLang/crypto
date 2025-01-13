@@ -4,28 +4,28 @@ import { F2, F12, F6 } from "../fields/index.js"
 
 /**
  * @import { FieldElement12, Point3, ProjectedCurve2 } from "../../../index.js"
- * @import { FieldElement6, ShortProjected } from "../../../internal.js"
+ * @import { FieldElement6 } from "../../../internal.js"
  */
 
 /**
  * @type {FieldElement6}
  */
-const ut_root = [F2.ZERO, F2.ONE, F2.ZERO]
+const ut_root = /* @__PURE__ */ (() => [F2.ZERO, F2.ONE, F2.ZERO])()
 
 /**
  * TODO: Evaluate this constant
  * @type {FieldElement12}
  */
-const wsq = [ut_root, F6.ZERO]
+const wsq = [ut_root, /* @__PURE__ */ (() => F6.ZERO)()]
 
 /**
  * TODO: Evaluate this constant
  * @type {FieldElement12}
  */
-const wcu = [F6.ZERO, ut_root]
+const wcu = [/* @__PURE__ */ (() => F6.ZERO)(), ut_root]
 
-const wsq_inv = F12.invert(wsq)
-const wcu_inv = F12.invert(wcu)
+const wsq_inv = /* @__PURE__ */ F12.invert(wsq)
+const wcu_inv = /* @__PURE__ */ F12.invert(wcu)
 
 // 1 / F2(2)^((p-1)/3) in GF(p²)
 const PSI2_C1 =
@@ -104,4 +104,5 @@ class ProjectedCurve2Impl extends ShortProjectedImpl {
 /**
  * @type {ProjectedCurve2}
  */
-export const projectedCurve2 = new ProjectedCurve2Impl()
+export const projectedCurve2 = (() =>
+    /* @__PURE__ */ new ProjectedCurve2Impl())()

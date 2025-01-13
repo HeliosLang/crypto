@@ -47,9 +47,11 @@ class WithSqrtImpl extends FieldWithOpsImpl {
 /**
  * @type {FieldWithSqrt}
  */
-export const F = new WithSqrtImpl()
+export const F = (() => /* @__PURE__ */ new WithSqrtImpl())()
 
 /**
  * @type {FieldWithOps<bigint>}
  */
-export const Z = makeFieldWithOps(makeScalarField(N))
+export const Z = /* @__PURE__ */ makeFieldWithOps(
+    /* @__PURE__ */ makeScalarField(N)
+)

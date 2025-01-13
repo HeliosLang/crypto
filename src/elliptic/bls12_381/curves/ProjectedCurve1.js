@@ -30,4 +30,5 @@ class ProjectedCurve1Impl extends ShortProjectedImpl {
 /**
  * @type {ProjectedCurve1}
  */
-export const projectedCurve1 = new ProjectedCurve1Impl()
+export const projectedCurve1 = (() =>
+    /* @__PURE__ */ new ProjectedCurve1Impl())()

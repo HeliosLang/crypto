@@ -105,4 +105,4 @@ class Field12WithExtendedOpsImpl extends FieldWithOpsImpl {
 /**
  * @type {Field12WithExtendedOps}
  */
-export const F12 = new Field12WithExtendedOpsImpl()
+export const F12 = (() => /* @__PURE__ */ new Field12WithExtendedOpsImpl())()

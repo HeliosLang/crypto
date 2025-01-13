@@ -1,7 +1,7 @@
 import { FieldWithOpsImpl, makeScalarField } from "../../common/index.js"
 import { CURVE1 } from "../constants.js"
 
-const P14 = (CURVE1.P + 1n) / 4n
+const P14 = /* @__PURE__ */ (() => (CURVE1.P + 1n) / 4n)()
 
 /**
  * @extends {FieldWithOpsImpl<bigint>}
@@ -40,4 +40,4 @@ class FieldWithSqrt extends FieldWithOpsImpl {
     }
 }
 
-export const F1 = new FieldWithSqrt()
+export const F1 = (() => /* @__PURE__ */ new FieldWithSqrt())()
